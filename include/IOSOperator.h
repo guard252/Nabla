@@ -17,7 +17,7 @@ class IOSOperator : public virtual core::IReferenceCounted
 {
 public:
 	//! Get the current operation system version as string.
-	virtual const core::stringc& getOperatingSystemVersion() const = 0;
+	virtual const std::string_view getOperatingSystemVersion() const = 0;
 
 	//! Copies text to the clipboard
 	virtual void copyToClipboard(const char* text) const = 0;

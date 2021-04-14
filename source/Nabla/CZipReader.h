@@ -186,7 +186,7 @@ namespace io
             CZipReader(IReadFile* file, bool isGZip=false);
 
             //! opens a file by file name
-            virtual IReadFile* createAndOpenFile(const io::path& filename);
+            virtual IReadFile* createAndOpenFile(const std::filesystem::path& filename);
 
             //! returns the list of files
             virtual const IFileList* getFileList() const;

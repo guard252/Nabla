@@ -1,7 +1,7 @@
 #ifndef __C_WINDOW_LINUX_H_INCLUDED__
 #define __C_WINDOW_LINUX_H_INCLUDED__
 
-#include "nbl/system/IWindowLinux.h"
+#include "nbl/system/CWindowLinux.h"
 
 #ifdef _NBL_PLATFORM_LINUX_
 

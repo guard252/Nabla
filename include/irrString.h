@@ -1133,10 +1133,10 @@ private:
 
 
 //! Typedef for character strings
-typedef string<char> stringc;
+//typedef string<char> stringc;
 
 //! Typedef for wide character strings
-typedef string<wchar_t> stringw;
+//typedef string<wchar_t> stringw;
 
 
 } // end namespace core

@@ -170,7 +170,7 @@ namespace impl
         {
             shaderc_include_result* res = new shaderc_include_result;
             std::string res_str;
-            io::path relDir;
+            std::filesystem::path relDir;
             const bool reqFromBuiltin = asset::IIncludeHandler::isBuiltinPath(_requesting_source);
             const bool reqBuiltin = asset::IIncludeHandler::isBuiltinPath(_requested_source);
             if (!reqFromBuiltin && !reqBuiltin)
@@ -180,16 +180,16 @@ namespace impl
                 //While including a filesystem file it must be either absolute path (or relative to any search dir added to asset::iIncludeHandler; <>-type),
                 //  or path relative to executable's working directory (""-type).
                 relDir = io::IFileSystem::getFileDir(_requesting_source);
-                if (relDir.lastChar() != '/')
-                    relDir.append('/');
+                if (*relDir.string().rbegin() != '/')
+                    relDir += '/';
             }
 
-            io::path name = (_type == shaderc_include_type_relative) ? (relDir + _requested_source) : (_requested_source);
+            std::filesystem::path name = (_type == shaderc_include_type_relative) ? (relDir.string() + _requested_source) : (_requested_source);
             if (!reqBuiltin)
                 name = m_fs->getAbsolutePath(name);
 
             if (_type == shaderc_include_type_relative)
-                res_str = m_inclHandler->getIncludeRelative(_requested_source, relDir.c_str());
+                res_str = m_inclHandler->getIncludeRelative(_requested_source, relDir.string());
             else //shaderc_include_type_standard
                 res_str = m_inclHandler->getIncludeStandard(_requested_source);
 
@@ -204,14 +204,14 @@ namespace impl
             else {
                 //employ encloseWithinExtraInclGuards() in order to prevent infinite loop of (not necesarilly direct) self-inclusions while other # directives (incl guards among them) are disabled
                 disableAllDirectivesExceptIncludes(res_str);
-                res_str = encloseWithinExtraInclGuards( std::move(res_str), m_maxInclCnt, name.c_str() );
+                res_str = encloseWithinExtraInclGuards( std::move(res_str), m_maxInclCnt, name.string().c_str() );
 
                 res->content_length = res_str.size();
                 res->content = new char[res_str.size()+1u];
                 strcpy(const_cast<char*>(res->content), res_str.c_str());
-                res->source_name_length = name.size();
-                res->source_name = new char[name.size()+1u];
-                strcpy(const_cast<char*>(res->source_name), name.c_str());
+                res->source_name_length = name.string().size();
+                res->source_name = new char[name.string().size()+1u];
+                strcpy(const_cast<char*>(res->source_name), name.string().c_str());
             }
 
             return res;

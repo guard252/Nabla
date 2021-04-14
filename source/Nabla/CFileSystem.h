@@ -31,30 +31,30 @@ class CFileSystem : public IFileSystem
         CFileSystem(std::string&& _builtinResourceDirectory);
 
         //! opens a file for read access
-        virtual IReadFile* createAndOpenFile(const io::path& filename);
+        virtual IReadFile* createAndOpenFile(const std::filesystem::path& filename);
 
         //! Creates an IReadFile interface for accessing memory like a file.
-        virtual IReadFile* createMemoryReadFile(const void* contents, size_t len, const io::path& fileName) override;
+        virtual IReadFile* createMemoryReadFile(const void* contents, size_t len, const std::filesystem::path& fileName) override;
 
         //! Creates an IReadFile interface for accessing files inside files
-        virtual IReadFile* createLimitReadFile(const io::path& fileName, IReadFile* alreadyOpenedFile, const size_t& pos, const size_t& areaSize);
+        virtual IReadFile* createLimitReadFile(const std::filesystem::path& fileName, IReadFile* alreadyOpenedFile, const size_t& pos, const size_t& areaSize);
 
         //! Creates an IWriteFile interface for accessing memory like a file.
-        virtual IWriteFile* createMemoryWriteFile(size_t len, const io::path& fileName) override;
+        virtual IWriteFile* createMemoryWriteFile(size_t len, const std::filesystem::path& fileName) override;
 
         //! Opens a file for write access.
-        virtual IWriteFile* createAndWriteFile(const io::path& filename, bool append=false);
+        virtual IWriteFile* createAndWriteFile(const std::filesystem::path& filename, bool append=false);
 
         //! Adds an archive to the file system.
-        virtual bool addFileArchive(const io::path& filename,
+        virtual bool addFileArchive(const std::filesystem::path& filename,
                 E_FILE_ARCHIVE_TYPE archiveType = EFAT_UNKNOWN,
-                const core::stringc& password="",
+                const std::string_view password="",
                 IFileArchive** retArchive = 0) override;
 
         //! Adds an archive to the file system.
         virtual bool addFileArchive(IReadFile* file,
                 E_FILE_ARCHIVE_TYPE archiveType=EFAT_UNKNOWN,
-                const core::stringc& password="",
+                const std::string_view password="",
                 IFileArchive** retArchive = 0) override;
 
         //! Adds an archive to the file system.
@@ -82,24 +82,24 @@ class CFileSystem : public IFileSystem
         virtual bool removeFileArchive(uint32_t index);
 
         //! removes an archive from the file system.
-        virtual bool removeFileArchive(const io::path& filename);
+        virtual bool removeFileArchive(const std::filesystem::path& filename);
 
         //! Removes an archive from the file system.
         virtual bool removeFileArchive(const IFileArchive* archive);
 
         //! Returns the string of the current working directory
-        virtual const io::path& getWorkingDirectory();
+        virtual const std::filesystem::path& getWorkingDirectory();
 
         //! Changes the current Working Directory to the string given.
         //! The string is operating system dependent. Under Windows it will look
         //! like this: "drive:\directory\sudirectory\"
-        virtual bool changeWorkingDirectoryTo(const io::path& newDirectory);
+        virtual bool changeWorkingDirectoryTo(const std::filesystem::path& newDirectory);
 
         //! Converts a relative path to an absolute (unique) path, resolving symbolic links
-        virtual io::path getAbsolutePath(const io::path& filename) const;
+       // virtual std::string getAbsolutePath(const std::filesystem::path& filename) const;
 
         //! Get the relative filename, relative to the given directory
-        virtual path getRelativeFilename(const path& filename, const path& directory) const;
+        virtual std::filesystem::path getRelativeFilename(const std::filesystem::path& filename, const std::filesystem::path& directory) const;
 
         virtual EFileSystemType setFileListSystem(EFileSystemType listType);
 
@@ -108,22 +108,22 @@ class CFileSystem : public IFileSystem
         virtual IFileList* createFileList();
 
         //! Creates an empty filelist
-        virtual IFileList* createEmptyFileList(const io::path& path) override;
+        virtual IFileList* createEmptyFileList(const std::filesystem::path& path) override;
 
         //! determines if a file exists and would be able to be opened.
-        virtual bool existFile(const io::path& filename) const;
+        virtual bool existFile(const std::filesystem::path& filename) const;
 
     private:
 
         // don't expose, needs refactoring
-        bool changeArchivePassword(const path& filename,
-                const core::stringc& password,
+        bool changeArchivePassword(const std::filesystem::path& filename,
+                const std::string_view password,
                 IFileArchive** archive = 0);
 
         //! Currently used FileSystemType
         EFileSystemType FileSystemType;
         //! WorkingDirectory for Native and Virtual filesystems
-        io::path WorkingDirectory [2];
+        std::filesystem::path WorkingDirectory[2];
         //! currently attached ArchiveLoaders
         core::vector<IArchiveLoader*> ArchiveLoader;
         //! currently attached Archives

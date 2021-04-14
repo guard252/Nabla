@@ -33,10 +33,10 @@ class IIncluder : public core::IReferenceCounted
 		{
 			for (const std::string& searchDir : m_searchDirectories)
 			{
-				io::path path = searchDir.c_str();
+				std::filesystem::path path = searchDir.c_str();
 				path += _path.c_str();
 				path = io::IFileSystem::flattenFilename(path);
-				std::string res = getInclude_internal(path.c_str());
+				std::string res = getInclude_internal(path.string());
 				if (!res.empty())
 					return res;
 			}
@@ -44,12 +44,12 @@ class IIncluder : public core::IReferenceCounted
 		}
 		std::string getIncludeRelative(const std::string& _path, const std::string& _workingDir) const
 		{
-			io::path path = _workingDir.c_str();
+			std::filesystem::path path = _workingDir.c_str();
 			if (!_workingDir.empty() && _workingDir.back() != '/')
 				path += "/";
 			path += _path.c_str();
 			path = io::IFileSystem::flattenFilename(path);
-			return getInclude_internal(path.c_str());
+			return getInclude_internal(path.string());
 		}
 
 	protected:

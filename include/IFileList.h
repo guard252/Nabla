@@ -20,12 +20,12 @@ struct SFileListEntry
 	//! The name of the file
 	/** If this is a file or folder in the virtual filesystem and the archive
 	was created with the ignoreCase flag then the file name will be lower case. */
-	io::path Name;
+	std::filesystem::path Name;
 
 	//! The name of the file including the path
 	/** If this is a file or folder in the virtual filesystem and the archive was
 	created with the ignoreDirs flag then it will be the same as Name. */
-	io::path FullName;
+	std::filesystem::path FullName;
 
 	//! The size of the file in bytes
 	uint32_t Size;
@@ -47,7 +47,9 @@ struct SFileListEntry
 		if (IsDirectory != other.IsDirectory)
 			return false;
 
-		return FullName.equals_ignore_case(other.FullName);
+		const auto& a = FullName.string();
+		const auto& b = other.FullName.string();
+		return std::equal(std::begin(a), std::end(a), std::begin(b), [](auto a, auto b) {return std::tolower(a) == std::tolower(b); });
 	}
 
 	//! The < operator is provided so that CFileList can sort and quickly search the list.
@@ -56,7 +58,9 @@ struct SFileListEntry
 		if (IsDirectory != other.IsDirectory)
 			return IsDirectory;
 
-		return FullName.lower_ignore_case(other.FullName);
+		const auto& a = FullName.string();
+		const auto& b = other.FullName.string();
+		return std::equal(std::begin(a), std::end(a), std::begin(b), [](auto a, auto b) {return std::tolower(a) < std::tolower(b); });
 	}
 };
 
@@ -76,10 +80,10 @@ public:
 	virtual core::vector<SFileListEntry> getFiles() const = 0;
 
     //! If @retval not equal to @param _end then file was found and return value is a valid pointer in the range given
-	virtual ListCIterator findFile(ListCIterator _begin, ListCIterator _end, const io::path& filename, bool isDirectory = false) const = 0;
+	virtual ListCIterator findFile(ListCIterator _begin, ListCIterator _end, const std::filesystem::path& filename, bool isDirectory = false) const = 0;
 
 	//! Returns the base path of the file list
-	virtual const io::path& getPath() const = 0;
+	virtual const std::filesystem::path& getPath() const = 0;
 };
 
 } // end namespace nbl

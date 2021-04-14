@@ -221,9 +221,9 @@ class IAssetManager : public core::IReferenceCounted, public core::QuitSignallin
 
             IAssetLoader::SAssetLoadContext ctx{params, _file};
 
-            std::string filename = _file ? _file->getFileName().c_str() : _supposedFilename;
+            std::string filename = _file ? _file->getFileName() : _supposedFilename;
             io::IReadFile* file = _override->getLoadFile(_file, filename, ctx, _hierarchyLevel); // WARNING: mem-leak possibility: _override should return smart_ptr<IReadFile> (TODO, inspect this)
-            filename = file ? file->getFileName().c_str() : _supposedFilename;
+            filename = file ? file->getFileName() : _supposedFilename;
 
             const uint64_t levelFlags = params.cacheFlags >> ((uint64_t)_hierarchyLevel * 2ull);
 
@@ -802,13 +802,10 @@ class IAssetManager : public core::IReferenceCounted, public core::QuitSignallin
             return insertAssetIntoCache(_asset, IAsset::EM_IMMUTABLE);
         }
 
-        static inline std::string getFileExt(const io::path& _filename)
+        static inline std::string getFileExt(const std::filesystem::path& _filename)
         {
-            int32_t dot = _filename.findLast('.');
-            return _filename
-                .subString(dot+1, _filename.size()-dot-1)
-                .make_lower()
-                .c_str();
+            auto extWithDot = _filename.extension().string();
+            return extWithDot.substr(1, extWithDot.size() - 1);
         }
 
         // for greet/dispose lambdas for asset caches so we don't have to make another friend decl.

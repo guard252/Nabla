@@ -6,9 +6,10 @@
 #ifndef __NBL_PATH_H_INCLUDED__
 #define __NBL_PATH_H_INCLUDED__
 
+#include <filesystem>
 #include "irrString.h"
-
 #include "nbl/core/compile_config.h"
+
 
 namespace nbl
 {

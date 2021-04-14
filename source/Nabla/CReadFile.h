@@ -26,7 +26,7 @@ namespace io
             virtual ~CReadFile();
 
         public:
-            CReadFile(const io::path& fileName);
+            CReadFile(const std::filesystem::path& fileName);
 
             //! returns how much was read
             virtual int32_t read(void* buffer, uint32_t sizeToRead);
@@ -47,7 +47,7 @@ namespace io
             virtual size_t getPos() const;
 
             //! returns name of file
-            virtual const io::path& getFileName() const;
+            virtual const std::filesystem::path& getFileName() const;
 
         private:
 
@@ -56,7 +56,7 @@ namespace io
 
             FILE* File;
             size_t FileSize;
-            io::path Filename;
+            std::filesystem::path Filename;
 	};
 
 } // end namespace io

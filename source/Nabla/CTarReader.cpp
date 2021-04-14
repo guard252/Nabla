@@ -169,7 +169,7 @@ uint32_t CTarReader::populateFileList()
 		// only add standard files for now
 		if (fHead.Link == ETLI_REGULAR_FILE || ETLI_REGULAR_FILE_OLD)
 		{
-			io::path fullPath = "";
+			std::string fullPath = "";
 			fullPath.reserve(255);
 
 			// USTAR archives have a filename prefix
@@ -178,7 +178,7 @@ uint32_t CTarReader::populateFileList()
 			{
 				char* np = fHead.FileNamePrefix;
 				while(*np && (np - fHead.FileNamePrefix) < 155)
-					fullPath.append(*np);
+					fullPath += *np;
 				np++;
 			}
 
@@ -186,17 +186,17 @@ uint32_t CTarReader::populateFileList()
 			char* np = fHead.FileName;
 			while(*np && (np - fHead.FileName) < 100)
 			{
-				fullPath.append(*np);
+				fullPath += *np;
 				np++;
 			}
 
 			// get size
-			core::stringc sSize = "";
+			std::string sSize = "";
 			sSize.reserve(12);
 			np = fHead.Size;
 			while(*np && (np - fHead.Size) < 12)
 			{
-				sSize.append(*np);
+				sSize += *np;
 				np++;
 			}
 
@@ -227,7 +227,7 @@ uint32_t CTarReader::populateFileList()
 }
 
 //! opens a file by file name
-IReadFile* CTarReader::createAndOpenFile(const io::path& filename)
+IReadFile* CTarReader::createAndOpenFile(const std::filesystem::path& filename)
 {
     auto it = findFile(Files.begin(),Files.end(),filename,false);
 	if (it!=Files.end())

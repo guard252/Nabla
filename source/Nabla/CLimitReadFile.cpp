@@ -113,7 +113,7 @@ size_t CLimitReadFile::getPos() const
 
 
 //! returns name of file
-const io::path& CLimitReadFile::getFileName() const
+const std::filesystem::path& CLimitReadFile::getFileName() const
 {
 	return Filename;
 }

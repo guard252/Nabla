@@ -14,7 +14,6 @@ namespace nbl
 {
 namespace io
 {
-
 //! Implementation of a file list
 class CFileList : public IFileList
 {
@@ -24,7 +23,7 @@ class CFileList : public IFileList
     public:
         //! Constructor
         /** \param path The path of this file archive */
-        CFileList(const io::path& path);
+        CFileList(const std::filesystem::path& path);
 
         //! Add as a file or folder to the list
         /** \param fullPath The file name including path, up to the root of the file list.
@@ -32,7 +31,7 @@ class CFileList : public IFileList
         \param offset The offset where the file is stored in an archive
         \param size The size of the file in bytes.
         \param id The ID of the file in the archive which owns it */
-        virtual void addItem(const io::path& fullPath, uint32_t offset, uint32_t size, bool isDirectory, uint32_t id=0);
+        virtual void addItem(const std::filesystem::path& fullPath, uint32_t offset, uint32_t size, bool isDirectory, uint32_t id=0);
 
         //! Returns the amount of files in the filelist.
         virtual uint32_t getFileCount() const override {return Files.size();}
@@ -44,14 +43,14 @@ class CFileList : public IFileList
         virtual core::vector<SFileListEntry> getFiles() const override {return Files;}
 
         //!
-        virtual ListCIterator findFile(ListCIterator _begin, ListCIterator _end, const io::path& filename, bool isDirectory = false) const override;
+        virtual ListCIterator findFile(ListCIterator _begin, ListCIterator _end, const std::filesystem::path& filename, bool isDirectory = false) const override;
 
         //! Returns the base path of the file list
-        virtual const io::path& getPath() const {return Path;}
+        virtual const std::filesystem::path& getPath() const {return Path;}
 
     protected:
         //! Path to the file list
-        io::path Path;
+        std::filesystem::path Path;
 
         //! List of files
         core::vector<SFileListEntry> Files;

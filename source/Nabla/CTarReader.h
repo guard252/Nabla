@@ -107,7 +107,7 @@ namespace io
 		CTarReader(IReadFile* file);
 
 		//! opens a file by file name
-		virtual IReadFile* createAndOpenFile(const io::path& filename);
+		virtual IReadFile* createAndOpenFile(const std::filesystem::path& filename);
 
 		//! returns the list of files
 		virtual const IFileList* getFileList() const;

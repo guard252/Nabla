@@ -194,7 +194,7 @@ bool CZipReader::scanGZipHeader()
 			File->seek(dataLen, true);
 		}
 
-		io::path ZipFileName = "";
+		std::filesystem::path ZipFileName = "";
 
 		if (header.flags & EGZF_FILE_NAME)
 		{
@@ -202,7 +202,7 @@ bool CZipReader::scanGZipHeader()
 			File->read(&c, 1);
 			while (c)
 			{
-				ZipFileName.append(c);
+				ZipFileName += c;
 				File->read(&c, 1);
 			}
 		}
@@ -215,13 +215,12 @@ bool CZipReader::scanGZipHeader()
 			// rename tgz to tar or remove gz extension
 			if (core::hasFileExtension(ZipFileName, "tgz"))
 			{
-				ZipFileName[ ZipFileName.size() - 2] = 'a';
-				ZipFileName[ ZipFileName.size() - 1] = 'r';
+				ZipFileName.string()[ ZipFileName.string().size() - 2] = 'a';
+				ZipFileName.string()[ ZipFileName.string().size() - 1] = 'r';
 			}
 			else if (core::hasFileExtension(ZipFileName, "gz"))
 			{
-				ZipFileName[ ZipFileName.size() - 3] = 0;
-				ZipFileName.validate();
+				ZipFileName.string()[ ZipFileName.string().size() - 3] = 0;
 			}
 		}
 
@@ -238,7 +237,7 @@ bool CZipReader::scanGZipHeader()
 		// we are now at the start of the data blocks
 		entry.Offset = File->getPos();
 
-		entry.header.FilenameLength = ZipFileName.size();
+		entry.header.FilenameLength = ZipFileName.string().length();
 
 		entry.header.CompressionMethod = header.compressionMethod;
 		entry.header.DataDescriptor.CompressedSize = (File->getSize() - 8) - File->getPos();
@@ -263,7 +262,7 @@ bool CZipReader::scanGZipHeader()
 //! scans for a local header, returns false if there is no more local file header.
 bool CZipReader::scanZipHeader(bool ignoreGPBits)
 {
-	io::path ZipFileName = "";
+	std::filesystem::path ZipFileName = "";
 	SZipFileEntry entry;
 	entry.Offset = 0;
 	memset(&entry.header, 0, sizeof(SZIPFileHeader));
@@ -402,7 +401,7 @@ bool CZipReader::scanCentralDirectoryHeader()
 
 
 //! opens a file by file name
-IReadFile* CZipReader::createAndOpenFile(const io::path& filename)
+IReadFile* CZipReader::createAndOpenFile(const std::filesystem::path& filename)
 {
     auto found = findFile(Files.begin(),Files.end(),io::IFileSystem::flattenFilename(filename),false);
 	if (found==Files.end())

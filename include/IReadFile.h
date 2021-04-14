@@ -43,7 +43,7 @@ namespace io
 
 		//! Get name of file.
 		/** \return File name as zero terminated character string. */
-		virtual const io::path& getFileName() const = 0;
+		virtual const std::string getFileName() const = 0;
 	};
 
 } // end namespace io

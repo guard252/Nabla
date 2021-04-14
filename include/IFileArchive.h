@@ -69,7 +69,7 @@ public:
 	avoid single access patterns to this place, and hence allow some more
 	obscurity.
 	*/
-	core::stringc Password;
+	std::string Password;
 };
 
 //! Class which is able to create an archive from a file.

@@ -11,7 +11,7 @@ namespace io
 {
 
 
-CReadFile::CReadFile(const io::path& fileName)
+CReadFile::CReadFile(const std::filesystem::path& fileName)
 : File(0), FileSize(0), Filename(fileName)
 {
 	#ifdef _NBL_DEBUG
@@ -68,7 +68,7 @@ size_t CReadFile::getPos() const
 //! opens the file
 void CReadFile::openFile()
 {
-	if (Filename.size() == 0) // bugfix posted by rt
+	if (Filename.string().size() == 0) // bugfix posted by rt
 	{
 		File = 0;
 		return;
@@ -77,7 +77,7 @@ void CReadFile::openFile()
 #if defined ( _NBL_WCHAR_FILESYSTEM )
 	File = _wfopen(Filename.c_str(), L"rb");
 #else
-	File = fopen(Filename.c_str(), "rb");
+	File = fopen(Filename.string().c_str(), "rb");
 #endif
 
 	if (File)
@@ -92,7 +92,7 @@ void CReadFile::openFile()
 
 
 //! returns name of file
-const io::path& CReadFile::getFileName() const
+const std::filesystem::path& CReadFile::getFileName() const
 {
 	return Filename;
 }

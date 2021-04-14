@@ -17,7 +17,7 @@ namespace io
 
 static const io::path emptyFileListEntry;
 
-CFileList::CFileList(const io::path& path) : Path(path)
+CFileList::CFileList(const std::filesystem::path& path) : Path(path)
 {
 	#ifdef _NBL_DEBUG
 	setDebugName("CFileList");
@@ -32,22 +32,21 @@ CFileList::~CFileList()
 }
 
 //! adds a file or folder
-void CFileList::addItem(const io::path& fullPath, uint32_t offset, uint32_t size, bool isDirectory, uint32_t id)
+void CFileList::addItem(const std::filesystem::path& fullPath, uint32_t offset, uint32_t size, bool isDirectory, uint32_t id)
 {
 	SFileListEntry entry;
 	entry.ID   = id ? id : Files.size();
 	entry.Offset = offset;
 	entry.Size = size;
 	entry.Name = fullPath;
-	handleBackslashes(&entry.Name);
+	core::handleBackslashes(&entry.Name);
 	entry.IsDirectory = isDirectory;
 
 	// remove trailing slash
-	if (entry.Name.lastChar() == '/')
+	if (*entry.Name.string().rbegin() == '/')
 	{
 		entry.IsDirectory = true;
-		entry.Name[entry.Name.size()-1] = 0;
-		entry.Name.validate();
+		entry.Name.string()[entry.Name.string().size()-1] = 0;
 	}
 
 	entry.FullName = entry.Name;
@@ -62,24 +61,14 @@ void CFileList::addItem(const io::path& fullPath, uint32_t offset, uint32_t size
 
 
 //! Searches for a file or folder within the list, returns the index
-IFileList::ListCIterator CFileList::findFile(IFileList::ListCIterator _begin, IFileList::ListCIterator _end, const io::path& filename, bool isDirectory) const
+IFileList::ListCIterator CFileList::findFile(IFileList::ListCIterator _begin, IFileList::ListCIterator _end, const std::filesystem::path& filename, bool isDirectory) const
 {
     SFileListEntry entry; 
     // we only need FullName to be set for the search
     entry.FullName = filename;
     entry.IsDirectory = isDirectory;
 
-    // exchange
-    handleBackslashes(&entry.FullName);
-
-    // remove trailing slash
-    if (entry.FullName.lastChar() == '/')
-    {
-        entry.IsDirectory = true;
-        entry.FullName[entry.FullName.size()-1] = 0;
-        entry.FullName.validate();
-    }
-	entry.Name = entry.FullName;
+	entry.Name = entry.FullName.filename();
 
     auto retval = std::lower_bound(_begin,_end,entry);
     if (retval!=_end && entry<*retval)

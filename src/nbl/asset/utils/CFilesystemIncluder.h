@@ -20,8 +20,8 @@ public:
 
     void addSearchDirectory(const std::string& _searchDir) override
     {
-        io::path absPath = m_filesystem->getAbsolutePath(_searchDir.c_str());
-        IIncluder::addSearchDirectory(absPath.c_str());
+        std::filesystem::path absPath = m_filesystem->getAbsolutePath(_searchDir.c_str());
+        IIncluder::addSearchDirectory(absPath.string());
     }
 
     std::string getInclude_internal(const std::string& _path) const override

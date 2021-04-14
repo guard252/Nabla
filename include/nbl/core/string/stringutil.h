@@ -13,6 +13,7 @@
 #include "string.h"
 #include "irrString.h" // file&class to kill
 #include "path.h" // file&class to kill
+#include <filesystem>
 
 namespace nbl
 {
@@ -138,7 +139,7 @@ namespace core
 	@param str2 Second string to compare.
 	@returns If sizes of the two strings differ - signed difference between two sizes (i.e. (str1.size()-str2.size()) );
 		Otherwise - an integral value indicating the relationship between the strings:
-			<0 - the first character that does not match has a lower value in str1 than in str2
+			<0 - the first character that does not match has a lower value in str1 t in str2
 			0  - both strings are equal
 			>0 - the first character that does not match has a greater value in str1 than in str2
 	*/
@@ -302,21 +303,9 @@ namespace core
 	@param filename File names string.
 	@returns Reference to filename (i.e. the parameter).
 	*/
-	inline io::path& deletePathFromFilename(io::path& filename)
+	inline std::filesystem::path& deletePathFromFilename(std::filesystem::path& filename)
 	{
-		// delete path from filename
-		const char* s = filename.c_str();
-		const char* p = s + filename.size();
-
-		// search for path separator or beginning
-		while (*p != '/' && *p != '\\' && p != s) //! On Linux just delete them
-			p--;
-
-		if (p != s)
-		{
-			++p;
-			filename = p;
-		}
+		filename = filename.filename();
 		return filename;
 	}
 
@@ -325,15 +314,15 @@ namespace core
 	@param pathCount Number of path-tokens to clip the given path to.
 	@returns Reference to the first parameter.
 	*/
-	inline io::path& deletePathFromPath(io::path& filename, int32_t pathCount)
+	inline std::filesystem::path& deletePathFromPath(std::filesystem::path& filename, int32_t pathCount)
 	{
 		// delete path from filename
-		int32_t i = filename.size();
+		int32_t i = filename.string().size();
 
 		// search for path separator or beginning
 		while (i >= 0)
 		{
-			if (filename[i] == '/' || filename[i] == '\\') //! On Linux just delete the '\\' from path
+			if (filename.string()[i] == '/' || filename.string()[i] == '\\') //! On Linux just delete the '\\' from path
 			{
 				if (--pathCount <= 0)
 					break;
@@ -343,8 +332,7 @@ namespace core
 
 		if (i > 0)
 		{
-			filename[i + 1] = 0;
-			filename.validate();
+			filename.string()[i + 1] = 0;
 		}
 		else
 			filename = "";
@@ -356,24 +344,24 @@ namespace core
 	@param file File name string.
 	@returns offset of directory. 0 means in same directory; 1 means file is direct child of path, etc.
 	*/
-	inline int32_t isInSameDirectory(const io::path& path, const io::path& file)
+	inline int32_t isInSameDirectory(const std::filesystem::path& path, const std::filesystem::path& file)
 	{
 		int32_t subA = 0;
 		int32_t subB = 0;
 		int32_t pos;
 
-		if (path.size() && !path.equalsn(file, path.size()))
+		if (path.string().size() && !std::equal(path.string().begin(), path.string().end(), file.string().begin()))
 			return -1;
 
 		pos = 0;
-		while ((pos = path.findNext('/', pos)) >= 0)
+		while ((pos = path.string().find("/", pos)) >= 0)
 		{
 			subA += 1;
 			pos += 1;
 		}
 
 		pos = 0;
-		while ((pos = file.findNext('/', pos)) >= 0)
+		while ((pos = file.string().find('/', pos)) >= 0)
 		{
 			subB += 1;
 			pos += 1;
@@ -385,9 +373,16 @@ namespace core
 	//! Replaces all occurences of backslash with regular slashes.
 	/** @param inout Pointer to string to modify.
 	*/
-	inline void handleBackslashes(io::path* inout)
+	inline void handleBackslashes(std::filesystem::path* inout)
 	{
-		inout->replace('\\', '/'); //! On Linux just delete them
+		std::replace(inout->string().begin(), inout->string().end(), '\\', '/'); //! On Linux just delete them
+	}
+
+
+	inline std::filesystem::path toLower(const std::filesystem::path& path)
+	{
+		return std::transform(path.string().begin(), path.string().end(), path.string().begin(),
+			[](unsigned char c) { return std::tolower(c); });
 	}
 
 	//! Splits a path into essential components.
@@ -398,37 +393,25 @@ namespace core
 	@param[out] extension Pointer to string where extension component will be returned.
 	@param[in] make_lower Whether to return all components as lower-case-only strings.
 	*/
-	inline void splitFilename(const io::path& name, io::path* path = 0,
-		io::path * filename = 0, io::path * extension = 0, bool make_lower = false)
+	inline void splitFilename(const std::filesystem::path& name, std::filesystem::path* path = 0,
+		std::filesystem::path * filename = 0, std::filesystem::path * extension = 0, bool make_lower = false)
 	{
-		int32_t i = name.size();
-		int32_t extpos = i;
-
-		// search for path separator or beginning
-		while (i >= 0)
+		if (path != nullptr)
 		{
-			if (name[i] == '.')
-			{
-				extpos = i;
-				if (extension)
-					* extension = name.subString(extpos + 1, name.size() - (extpos + 1), make_lower);
-			}
-			else
-				if (name[i] == '/' || name[i] == '\\') //! On Linux just delete them
-				{
-					if (filename)
-						* filename = name.subString(i + 1, extpos - (i + 1), make_lower);
-					if (path)
-					{
-						*path = name.subString(0, i + 1, make_lower);
-						handleBackslashes(path);
-					}
-					return;
-				}
-			i -= 1;
+			*path = name.parent_path();
+			handleBackslashes(path);
+			if (make_lower) *path = toLower(*path);
 		}
-		if (filename)
-			* filename = name.subString(0, extpos, make_lower);
+		if (filename != nullptr)
+		{
+			*filename = name.filename();
+			if (make_lower) *filename = toLower(*filename);
+		}
+		if (extension != nullptr)
+		{
+			*extension = name.extension();
+			if(make_lower) *extension = toLower(*extension);
+		}
 	}
 
 	//! some standard function ( to remove dependencies )

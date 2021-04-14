@@ -38,7 +38,7 @@ class CSTLMeshFileLoader final : public IAssetLoader
 		// skips to the first non-space character available
 		void goNextWord(io::IReadFile* file) const;
 		// returns the next word
-		const core::stringc& getNextToken(io::IReadFile* file, core::stringc& token) const;
+		const std::string_view getNextToken(io::IReadFile* file, const std::string_view token) const;
 		// skip to next printable character after the first line break
 		void goNextLine(io::IReadFile* file) const;
 		//! Read 3d vector of floats

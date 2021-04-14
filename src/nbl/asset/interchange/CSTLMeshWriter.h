@@ -45,7 +45,7 @@ class CSTLMeshWriter : public asset::IAssetWriter
         bool writeMeshASCII(io::IWriteFile* file, const asset::ICPUMesh* mesh, const SAssetWriteParams& _params);
 
         // create vector output with line end into string
-        void getVectorAsStringLine(const core::vectorSIMDf& v, core::stringc& s) const;
+        void getVectorAsStringLine(const core::vectorSIMDf& v, const std::string_view s) const;
 
         // write face information to file
         void writeFaceText(io::IWriteFile* file, const core::vectorSIMDf& v1,

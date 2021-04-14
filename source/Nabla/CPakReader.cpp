@@ -153,14 +153,14 @@ bool CPakReader::scanLocalHeader()
 		os::Printer::log(entry.name);
 #endif
 
-		addItem(io::path(entry.name), entry.offset, entry.length, false );
+		addItem(std::filesystem::path(entry.name), entry.offset, entry.length, false );
 	}
 	return true;
 }
 
 
 //! opens a file by file name
-IReadFile* CPakReader::createAndOpenFile(const io::path& filename)
+IReadFile* CPakReader::createAndOpenFile(const std::filesystem::path& filename)
 {
     auto it = findFile(Files.begin(),Files.end(),filename,false);
 	if (it!=Files.end())

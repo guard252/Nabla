@@ -90,7 +90,7 @@ CFileSystem::~CFileSystem()
 
 
 //! opens a file for read access
-IReadFile* CFileSystem::createAndOpenFile(const io::path& filename)
+IReadFile* CFileSystem::createAndOpenFile(const std::filesystem::path& filename)
 {
 	IReadFile* file = 0;
 	uint32_t i;
@@ -135,14 +135,14 @@ IReadFile* CFileSystem::createLimitReadFile(const io::path& fileName,
 
 
 //! Creates an IReadFile interface for treating memory like a file.
-IWriteFile* CFileSystem::createMemoryWriteFile(size_t len, const io::path& fileName)
+IWriteFile* CFileSystem::createMemoryWriteFile(size_t len, const std::filesystem::path& fileName)
 {
     return new CMemoryWriteFile(len, fileName);
 }
 
 
 //! Opens a file for write access.
-IWriteFile* CFileSystem::createAndWriteFile(const io::path& filename, bool append)
+IWriteFile* CFileSystem::createAndWriteFile(const std::filesystem::path& filename, bool append)
 {
 	return createWriteFile(filename, append);
 }
@@ -197,8 +197,8 @@ bool CFileSystem::moveFileArchive(uint32_t sourceIndex, int32_t relative)
 
 
 //! Adds an archive to the file system.
-bool CFileSystem::addFileArchive(const io::path& filename, E_FILE_ARCHIVE_TYPE archiveType,
-			  const core::stringc& password,
+bool CFileSystem::addFileArchive(const std::filesystem::path& filename, E_FILE_ARCHIVE_TYPE archiveType,
+			  const std::string_view password,
 			  IFileArchive** retArchive)
 {
 	IFileArchive* archive = 0;
@@ -303,17 +303,17 @@ bool CFileSystem::addFileArchive(const io::path& filename, E_FILE_ARCHIVE_TYPE a
 }
 
 // don't expose!
-bool CFileSystem::changeArchivePassword(const path& filename,
-		const core::stringc& password,
+bool CFileSystem::changeArchivePassword(const std::filesystem::path& filename,
+		const std::string_view password,
 		IFileArchive** archive)
 {
 	for (int32_t idx = 0; idx < (int32_t)FileArchives.size(); ++idx)
 	{
 		// TODO: This should go into a path normalization method
 		// We need to check for directory names with trailing slash and without
-		const path absPath = getAbsolutePath(filename);
-		const path arcPath = FileArchives[idx]->getFileList()->getPath();
-		if ((absPath == arcPath) || ((absPath+"/") == arcPath))
+		const std::filesystem::path absPath = getAbsolutePath(filename);
+		const std::filesystem::path arcPath = FileArchives[idx]->getFileList()->getPath();
+		if ((absPath == arcPath) || ((absPath.string() + "/") == arcPath))
 		{
 			if (password.size())
 				FileArchives[idx]->Password=password;
@@ -327,7 +327,7 @@ bool CFileSystem::changeArchivePassword(const path& filename,
 }
 
 bool CFileSystem::addFileArchive(IReadFile* file, E_FILE_ARCHIVE_TYPE archiveType,
-		const core::stringc& password, IFileArchive** retArchive)
+		const std::string_view password, IFileArchive** retArchive)
 {
 	if (!file || archiveType == EFAT_FOLDER)
 		return false;
@@ -400,7 +400,7 @@ bool CFileSystem::addFileArchive(IReadFile* file, E_FILE_ARCHIVE_TYPE archiveTyp
 		}
 		else
 		{
-			os::Printer::log("Could not create archive for", file->getFileName().c_str(), ELL_ERROR);
+			os::Printer::log("Could not create archive for", file->getFileName(), ELL_ERROR);
 		}
 	}
 
@@ -438,9 +438,9 @@ bool CFileSystem::removeFileArchive(uint32_t index)
 
 
 //! removes an archive from the file system.
-bool CFileSystem::removeFileArchive(const io::path& filename)
+bool CFileSystem::removeFileArchive(const std::filesystem::path& filename)
 {
-	const path absPath = getAbsolutePath(filename);
+	const std::filesystem::path absPath = getAbsolutePath(filename);
 	for (uint32_t i=0; i < FileArchives.size(); ++i)
 	{
 		if (absPath == FileArchives[i]->getFileList()->getPath())
@@ -478,7 +478,7 @@ IFileArchive* CFileSystem::getFileArchive(uint32_t index)
 
 
 //! Returns the string of the current working directory
-const io::path& CFileSystem::getWorkingDirectory()
+const std::filesystem::path& CFileSystem::getWorkingDirectory()
 {
 	EFileSystemType type = FileSystemType;
 
@@ -497,7 +497,7 @@ const io::path& CFileSystem::getWorkingDirectory()
 				_getcwd(tmp, _MAX_PATH);
 				WorkingDirectory[FILESYSTEM_NATIVE] = tmp;
 			#endif
-            handleBackslashes(&WorkingDirectory[FILESYSTEM_NATIVE]);
+            core::handleBackslashes(&WorkingDirectory[FILESYSTEM_NATIVE]);
 		#endif
 
 		#if (defined(_NBL_POSIX_API_) || defined(_NBL_OSX_PLATFORM_))
@@ -536,8 +536,6 @@ const io::path& CFileSystem::getWorkingDirectory()
 				}
 			#endif
 		#endif
-
-		WorkingDirectory[type].validate();
 	}
 
 	return WorkingDirectory[type];
@@ -545,7 +543,7 @@ const io::path& CFileSystem::getWorkingDirectory()
 
 
 //! Changes the current Working Directory to the given string.
-bool CFileSystem::changeWorkingDirectoryTo(const io::path& newDirectory)
+bool CFileSystem::changeWorkingDirectoryTo(const std::filesystem::path& newDirectory)
 {
 	bool success=false;
 
@@ -564,7 +562,7 @@ bool CFileSystem::changeWorkingDirectoryTo(const io::path& newDirectory)
 	#if defined(_NBL_WCHAR_FILESYSTEM)
 		success = (_wchdir(newDirectory.c_str()) == 0);
 	#else
-		success = (_chdir(newDirectory.c_str()) == 0);
+		success = (_chdir(newDirectory.string().c_str()) == 0);
 	#endif
 #else
     #if defined(_NBL_WCHAR_FILESYSTEM)
@@ -579,41 +577,40 @@ bool CFileSystem::changeWorkingDirectoryTo(const io::path& newDirectory)
 }
 
 
-io::path CFileSystem::getAbsolutePath(const io::path& filename) const
-{
-#if defined(_NBL_WINDOWS_API_)
-	char *p=0;
-	char fpath[_MAX_PATH];
-	#if defined(_NBL_WCHAR_FILESYSTEM )
-		p = _wfullpath(fpath, filename.c_str(), _MAX_PATH);
-		core::stringw tmp(p);
-	#else
-		p = _fullpath(fpath, filename.c_str(), _MAX_PATH);
-		core::stringc tmp(p);
-	#endif
-	handleBackslashes(&tmp);
-	return tmp;
-#elif (defined(_NBL_POSIX_API_) || defined(_NBL_OSX_PLATFORM_))
-	char* p=0;
-	char fpath[4096];
-	fpath[0]=0;
-	p = realpath(filename.c_str(), fpath);
-	if (!p)
-	{
-		// content in fpath is unclear at this point
-		if (!fpath[0]) // seems like fpath wasn't altered, use our best guess
-			return flattenFilename(filename);
-		else
-			return io::path(fpath);
-	}
-	if (filename[filename.size()-1]=='/')
-		return io::path(p)+"/";
-	else
-		return io::path(p);
-#else
-	return io::path(filename);
-#endif
-}
+//std::string CFileSystem::getAbsolutePath(const io::path& filename) const
+//{
+//#if defined(_NBL_WINDOWS_API_)
+//	char *p=0;
+//	char fpath[_MAX_PATH];
+//	#if defined(_NBL_WCHAR_FILESYSTEM )
+//		p = _wfullpath(fpath, filename.c_str(), _MAX_PATH);
+//		std::wstring tmp(p);
+//	#else
+//		p = _fullpath(fpath, filename.c_str(), _MAX_PATH);
+//		std::string tmp(p);
+//	#endif
+//	return tmp.c_str();
+//#elif (defined(_NBL_POSIX_API_) || defined(_NBL_OSX_PLATFORM_))
+//	char* p=0;
+//	char fpath[4096];
+//	fpath[0]=0;
+//	p = realpath(filename.c_str(), fpath);
+//	if (!p)
+//	{
+//		// content in fpath is unclear at this point
+//		if (!fpath[0]) // seems like fpath wasn't altered, use our best guess
+//			return flattenFilename(filename);
+//		else
+//			return io::path(fpath);
+//	}
+//	if (filename[filename.size()-1]=='/')
+//		return io::path(p)+"/";
+//	else
+//		return io::path(p);
+//#else
+//	return io::path(filename);
+//#endif
+//}
 
 
 
@@ -651,68 +648,9 @@ io::path CFileSystem::getAbsolutePath(const io::path& filename) const
 */
 
 //! Get the relative filename, relative to the given directory
-path CFileSystem::getRelativeFilename(const path& filename, const path& directory) const
+std::filesystem::path CFileSystem::getRelativeFilename(const std::filesystem::path& filename, const std::filesystem::path& directory) const
 {
-	if ( filename.empty() || directory.empty() )
-		return filename;
-
-	io::path path1, file, ext;
-	core::splitFilename(getAbsolutePath(filename), &path1, &file, &ext);
-	io::path path2(getAbsolutePath(directory));
-	core::list<io::path> list1, list2;
-	path1.split(list1, "/\\", 2);
-	path2.split(list2, "/\\", 2);
-	uint32_t i=0;
-	core::list<io::path>::const_iterator it1,it2;
-	it1=list1.begin();
-	it2=list2.begin();
-
-	#if defined (_NBL_WINDOWS_API_)
-	char partition1 = 0, partition2 = 0;
-	io::path prefix1, prefix2;
-	if ( it1 != list1.end() )
-		prefix1 = *it1;
-	if ( it2 != list2.end() )
-		prefix2 = *it2;
-	if ( prefix1.size() > 1 && prefix1[1] == ':' )
-		partition1 = core::locale_lower(prefix1[0]);
-	if ( prefix2.size() > 1 && prefix2[1] == ':' )
-		partition2 = core::locale_lower(prefix2[0]);
-
-	// must have the same prefix or we can't resolve it to a relative filename
-	if ( partition1 != partition2 )
-	{
-		return filename;
-	}
-	#endif
-
-
-	for (; i<list1.size() && i<list2.size()
-#if defined (_NBL_WINDOWS_API_)
-		&& (io::path(*it1).make_lower()==io::path(*it2).make_lower())
-#else
-		&& (*it1==*it2)
-#endif
-		; ++i)
-	{
-		++it1;
-		++it2;
-	}
-	path1="";
-	for (; i<list2.size(); ++i)
-		path1 += "../";
-	while (it1 != list1.end())
-	{
-		path1.append(*it1++);
-		path1.append('/');
-	}
-	path1 += file;
-	if (ext.size())
-	{
-		path1.append('.');
-		path1 += ext;
-	}
-	return path1;
+	std::filesystem::relative(filename, directory);
 }
 
 
@@ -729,10 +667,10 @@ EFileSystemType CFileSystem::setFileListSystem(EFileSystemType listType)
 IFileList* CFileSystem::createFileList()
 {
 	CFileList* r = 0;
-	io::path Path = getWorkingDirectory();
-	handleBackslashes(&Path);
-	if (Path.lastChar() != '/')
-		Path.append('/');
+	std::filesystem::path Path = getWorkingDirectory();
+	core::handleBackslashes(&Path);
+	if (*Path.string().rbegin() != '/')
+		Path += '/';
 
 	//! Construct from native filesystem
 	if (FileSystemType == FILESYSTEM_NATIVE)
@@ -756,7 +694,7 @@ IFileList* CFileSystem::createFileList()
 		{
 			do
 			{
-				r->addItem(Path + c_file.name, 0, c_file.size, (_A_SUBDIR & c_file.attrib) != 0, 0);
+				r->addItem(Path.string() + c_file.name, 0, c_file.size, (_A_SUBDIR & c_file.attrib) != 0, 0);
 			}
 			while( _tfindnext( hFile, &c_file ) == 0 );
 
@@ -824,10 +762,10 @@ IFileList* CFileSystem::createFileList()
 		SFileListEntry e3;
 
 		//! PWD
-		r->addItem(Path + ".", 0, 0, true, 0);
+		r->addItem(Path.string() + ".", 0, 0, true, 0);
 
 		//! parent
-		r->addItem(Path + "..", 0, 0, true, 0);
+		r->addItem(Path.string() + "..", 0, 0, true, 0);
 
 		//! merge archives
 		for (uint32_t i=0; i < FileArchives.size(); ++i)
@@ -854,7 +792,7 @@ IFileList* CFileSystem::createEmptyFileList(const io::path& path)
 
 
 //! determines if a file exists and would be able to be opened.
-bool CFileSystem::existFile(const io::path& filename) const
+bool CFileSystem::existFile(const std::filesystem::path& filename) const
 {
 	for (uint32_t i=0; i < FileArchives.size(); ++i)
 	{

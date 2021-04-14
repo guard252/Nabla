@@ -50,7 +50,7 @@ namespace io
             inline size_t getPos() const {return Pos;}
 
             //! returns name of file
-            inline const io::path& getFileName() const {return Filename;}
+            inline const std::filesystem::path& getFileName() const {return Filename;}
 
             //! Constructor
             CMemoryFile(const size_t& len, const io::path& fileName);
@@ -62,7 +62,7 @@ namespace io
             core::vector<uint8_t> Buffer;
             size_t      Pos;
         private:
-            io::path    Filename;
+            std::filesystem::path    Filename;
 	};
 
 	class CMemoryWriteFile : public IWriteFile, public CMemoryFile
@@ -81,7 +81,7 @@ namespace io
             virtual size_t getPos() const {return CMemoryFile::getPos();}
 
             //! returns name of file
-            virtual const io::path& getFileName() const {return CMemoryFile::getFileName();}
+            virtual const std::filesystem::path& getFileName() const {return CMemoryFile::getFileName();}
 
             //! returns how much was written
             virtual int32_t write(const void* buffer, uint32_t sizeToWrite);
@@ -137,7 +137,7 @@ namespace io
 
         virtual size_t getPos() const override { return m_position; }
 
-        virtual const io::path& getFileName() const override { return m_filename; }
+        virtual const std::filesystem::path& getFileName() const override { return m_filename; }
 
         virtual int32_t read(void* buffer, uint32_t sizeToRead) override
         {
@@ -161,7 +161,7 @@ namespace io
         void* m_storage;
         size_t m_length;
         size_t m_position;
-        io::path m_filename;
+        std::filesystem::path m_filename;
         Alloc m_allocator;
     };
 
@@ -175,7 +175,7 @@ namespace io
     public:
         using Base::Base;
 
-        CCustomAllocatorMemoryReadFile(const void* _data, size_t _length, const io::path& _filename, Alloc&& _alloc = Alloc()) :
+        CCustomAllocatorMemoryReadFile(const void* _data, size_t _length, const std::filesystem::path& _filename, Alloc&& _alloc = Alloc()) :
             Base(const_cast<void*>(_data), _length, _filename, core::adopt_memory, std::move(_alloc))
         {
             const void* tmp = Base::m_storage;
@@ -192,11 +192,11 @@ namespace io
         virtual ~CMemoryReadFile() = default;
 
     public:
-        CMemoryReadFile(void* _data, size_t _length, const io::path& _filename, core::adopt_memory_t) :
+        CMemoryReadFile(void* _data, size_t _length, const std::filesystem::path& _filename, core::adopt_memory_t) :
             Base(_data, _length, _filename, core::adopt_memory)
         {
         }
-        CMemoryReadFile(const void* _data, size_t _length, const io::path& _filename) :
+        CMemoryReadFile(const void* _data, size_t _length, const std::filesystem::path& _filename) :
             Base(_data, _length, _filename)
         {
         }

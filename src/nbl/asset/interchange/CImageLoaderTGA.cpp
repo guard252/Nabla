@@ -287,7 +287,7 @@ asset::SAssetBundle CImageLoaderTGA::loadAsset(io::IReadFile* _file, const asset
 	{
 		case STIT_NONE:
 		{
-			os::Printer::log("The given TGA doesn't have image data", _file->getFileName().c_str(), ELL_ERROR);
+			os::Printer::log("The given TGA doesn't have image data", _file->getFileName(), ELL_ERROR);
 			return {};
 		}
 		case STIT_UNCOMPRESSED_RGB_IMAGE: [[fallthrough]];
@@ -308,7 +308,7 @@ asset::SAssetBundle CImageLoaderTGA::loadAsset(io::IReadFile* _file, const asset
 		}
 		default:
 		{
-			os::Printer::log("Unsupported TGA file type", _file->getFileName().c_str(), ELL_ERROR);
+			os::Printer::log("Unsupported TGA file type", _file->getFileName(), ELL_ERROR);
             return {};
 		}
 	}
@@ -346,7 +346,7 @@ asset::SAssetBundle CImageLoaderTGA::loadAsset(io::IReadFile* _file, const asset
 			}
 			break;
 		default:
-			os::Printer::log("Unsupported TGA format", _file->getFileName().c_str(), ELL_ERROR);
+			os::Printer::log("Unsupported TGA format", _file->getFileName(), ELL_ERROR);
 			break;
 	}
 

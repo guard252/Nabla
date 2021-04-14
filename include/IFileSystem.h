@@ -4,7 +4,7 @@
 
 #ifndef __NBL_I_FILE_SYSTEM_H_INCLUDED__
 #define __NBL_I_FILE_SYSTEM_H_INCLUDED__
-
+#include <filesystem>
 #include "nbl/core/IReferenceCounted.h"
 #include "IFileArchive.h"
 #include "nbl/asset/ICPUBuffer.h"
@@ -51,7 +51,7 @@ class IFileSystem : public virtual core::IReferenceCounted
 		The returned pointer should be dropped when no longer needed.
 		See IReferenceCounted::drop() for more information.
 		*/
-		virtual IReadFile* createMemoryReadFile(const void* contents, size_t len, const io::path& fileName) = 0;
+		virtual IReadFile* createMemoryReadFile(const void* contents, size_t len, const std::filesystem::path& fileName) = 0;
 
 		//! Creates an IReadFile interface for accessing files inside files.
 		/** This is useful e.g. for archives.
@@ -63,7 +63,7 @@ class IFileSystem : public virtual core::IReferenceCounted
 		The returned pointer should be dropped when no longer needed.
 		See IReferenceCounted::drop() for more information.
 		*/
-		virtual IReadFile* createLimitReadFile(const path& fileName,
+		virtual IReadFile* createLimitReadFile(const std::filesystem::path& fileName,
 				IReadFile* alreadyOpenedFile, const size_t& pos, const size_t& areaSize) =0;
 
 		//! Creates an IWriteFile interface for accessing memory like a file.
@@ -78,7 +78,7 @@ class IFileSystem : public virtual core::IReferenceCounted
 		The returned pointer should be dropped when no longer needed.
 		See IReferenceCounted::drop() for more information.
 		*/
-		virtual IWriteFile* createMemoryWriteFile(size_t len, const io::path& fileName) =0;
+		virtual IWriteFile* createMemoryWriteFile(size_t len, const std::filesystem::path& fileName) =0;
 
 
 		//! Opens a file for write access.
@@ -89,7 +89,7 @@ class IFileSystem : public virtual core::IReferenceCounted
 		file could not created or opened for writing.
 		The returned pointer should be dropped when no longer needed.
 		See IReferenceCounted::drop() for more information. */
-		virtual IWriteFile* createAndWriteFile(const path& filename, bool append=false) =0;
+		virtual IWriteFile* createAndWriteFile(const std::filesystem::path& filename, bool append=false) =0;
 
 		//! Adds an archive to the file system.
 		/** After calling this, the Irrlicht Engine will also search and open
@@ -109,9 +109,9 @@ class IFileSystem : public virtual core::IReferenceCounted
 		\param password An optional password, which is used in case of encrypted archives.
 		\param retArchive A pointer that will be set to the archive that is added.
 		\return True if the archive was added successfully, false if not. */
-		virtual bool addFileArchive(const path& filename,
+		virtual bool addFileArchive(const std::filesystem::path& filename,
 				E_FILE_ARCHIVE_TYPE archiveType=EFAT_UNKNOWN,
-				const core::stringc& password="",
+				const std::string_view password="",
 				IFileArchive** retArchive=0) =0;
 
 		//! Adds an archive to the file system.
@@ -138,7 +138,7 @@ class IFileSystem : public virtual core::IReferenceCounted
 		\return True if the archive was added successfully, false if not. */
 		virtual bool addFileArchive(IReadFile* file,
 				E_FILE_ARCHIVE_TYPE archiveType=EFAT_UNKNOWN,
-				const core::stringc& password="",
+				const std::string_view password="",
 				IFileArchive** retArchive=0) =0;
 
 		//! Adds an archive to the file system.
@@ -169,7 +169,7 @@ class IFileSystem : public virtual core::IReferenceCounted
 		locating the archive to work with.
 		\param filename The archive pointed to by the name will be removed
 		\return True on success, false on failure */
-		virtual bool removeFileArchive(const path& filename) =0;
+		virtual bool removeFileArchive(const std::filesystem::path& filename) =0;
 
 		//! Removes an archive from the file system.
 		/** This will close the archive and free any file handles, but will not
@@ -204,22 +204,22 @@ class IFileSystem : public virtual core::IReferenceCounted
 
 		//! Get the current working directory.
 		/** \return Current working directory as a string. */
-		virtual const path& getWorkingDirectory() =0;
+		virtual const std::filesystem::path& getWorkingDirectory() =0;
 
 		//! Changes the current working directory.
 		/** \param newDirectory: A string specifying the new working directory.
 		The string is operating system dependent. Under Windows it has
 		the form "<drive>:\<directory>\<sudirectory>\<..>". An example would be: "C:\Windows\"
 		\return True if successful, otherwise false. */
-		virtual bool changeWorkingDirectoryTo(const path& newDirectory) =0;
+		virtual bool changeWorkingDirectoryTo(const std::filesystem::path& newDirectory) =0;
 
 		//! Converts a relative path to an absolute (unique) path, resolving symbolic links if required
 		/** \param filename Possibly relative file or directory name to query.
 		\result Absolute filename which points to the same file. */
-		virtual path getAbsolutePath(const path& filename) const =0;
+		virtual std::filesystem::path getAbsolutePath(const std::filesystem::path& filename) const =0;
 
 		//! Get the relative filename, relative to the given directory
-		virtual path getRelativeFilename(const path& filename, const path& directory) const =0;
+		virtual std::filesystem::path getRelativeFilename(const std::filesystem::path& filename, const std::filesystem::path& directory) const =0;
 
 		//! Creates a list of files and directories in the current working directory and returns it.
 		/** \return a Pointer to the created IFileList is returned. After the list has been used
@@ -231,7 +231,7 @@ class IFileSystem : public virtual core::IReferenceCounted
 		/** \return a Pointer to the created IFileList is returned. After the list has been used
 		it has to be deleted using its IFileList::drop() method.
 		See IReferenceCounted::drop() for more information. */
-		virtual IFileList* createEmptyFileList(const io::path& path) =0;
+		virtual IFileList* createEmptyFileList(const std::filesystem::path& path) =0;
 
 		//! Set the active type of file system.
 		virtual EFileSystemType setFileListSystem(EFileSystemType listType) =0;
@@ -239,7 +239,7 @@ class IFileSystem : public virtual core::IReferenceCounted
 		//! Determines if a file exists and could be opened.
 		/** \param filename is the string identifying the file which should be tested for existence.
 		\return True if file exists, and false if it does not exist or an error occured. */
-		virtual bool existFile(const path& filename) const =0;
+		virtual bool existFile(const std::filesystem::path& filename) const =0;
 
 
 		//! Run-time resource ID, `builtinPath` includes the "nbl/builtin" prefix
@@ -296,47 +296,40 @@ class IFileSystem : public virtual core::IReferenceCounted
 		//! Get the directory a file is located in.
 		/** \param filename: The file to get the directory from.
 		\return String containing the directory of the file. */
-		static inline path getFileDir(const path& filename)
+		static inline std::filesystem::path getFileDir(const std::filesystem::path& filename)
 		{
-			// find last forward or backslash
-			int32_t lastSlash = filename.findLast('/');
-			const int32_t lastBackSlash = filename.findLast('\\'); //! Just remove those '\' on Linux
-			lastSlash = core::max<int32_t>(lastSlash, lastBackSlash);
-
-			if ((uint32_t)lastSlash < filename.size())
-				return filename.subString(0, lastSlash);
-			else
-				return path(".");
+			return filename.parent_path();
 		}
 
 		//! flatten a path and file name for example: "/you/me/../." becomes "/you"
-		static inline path flattenFilename(const path& _directory, const path& root="/")
+		static inline std::filesystem::path flattenFilename(const std::filesystem::path& _directory, const std::filesystem::path& root="/")
 		{
-			auto directory(_directory);
-			handleBackslashes(&directory);
 
-			io::path dir;
-			io::path subdir;
+			auto directory(_directory);
+			nbl::core::handleBackslashes(&directory);
+
+			std::filesystem::path dir;
+			std::filesystem::path subdir;
 
 			int32_t lastpos = 0;
 			int32_t pos = 0;
-			bool lastWasRealDir=false;
+			bool lastwasrealdir=false;
 
 			auto process = [&]() -> void
 			{
-				subdir = directory.subString(lastpos, pos - lastpos + 1);
+				subdir = directory.string().substr(lastpos, pos - lastpos + 1);
 
 				if (subdir == "../")
 				{
-					if (lastWasRealDir)
+					if (lastwasrealdir)
 					{
-						deletePathFromPath(dir, 2);
-						lastWasRealDir = (dir.size() != 0);
+						nbl::core::deletePathFromPath(dir, 2);
+						lastwasrealdir = (dir.string().size() != 0);
 					}
 					else
 					{
-						dir.append(subdir);
-						lastWasRealDir = false;
+						dir += subdir;
+						lastwasrealdir = false;
 					}
 				}
 				else if (subdir == "/")
@@ -345,19 +338,19 @@ class IFileSystem : public virtual core::IReferenceCounted
 				}
 				else if (subdir != "./")
 				{
-					dir.append(subdir);
-					lastWasRealDir = true;
+					dir += subdir;
+					lastwasrealdir = true;
 				}
 
 				lastpos = pos + 1;
 			};
-			while ((pos = directory.findNext('/', lastpos)) >= 0)
+			while ((pos = directory.string().find("/", lastpos)) >= 0)
 			{
 				process();
 			}
-			if (directory.lastChar() != '/')
+			if (*directory.string().rbegin() != '/')
 			{
-				pos = directory.size();
+				pos = directory.string().size();
 				process();
 			}
 			return dir;
@@ -368,32 +361,10 @@ class IFileSystem : public virtual core::IReferenceCounted
 		\param filename: The file to get the basename from
 		\param keepExtension True if filename with extension is returned otherwise everything
 		after the final '.' is removed as well. */
-		static inline path getFileBasename(const path& filename, bool keepExtension=true)
+		static inline std::filesystem::path getFileBasename(const std::filesystem::path& filename, bool keepExtension=true)
 		{
-			// find last forward or backslash
-			int32_t lastSlash = filename.findLast('/');
-			const int32_t lastBackSlash = filename.findLast('\\'); //! Just remove those '\' on Linux
-			lastSlash = core::max<int32_t>(lastSlash, lastBackSlash);
-
-			// get number of chars after last dot
-			int32_t end = 0;
-			if (!keepExtension)
-			{
-				// take care to search only after last slash to check only for
-				// dots in the filename
-				end = filename.findLast('.'); //! Use a reverse search with iterators to give a limit on how far back to search
-				if (end == -1 || end < lastSlash)
-					end=0;
-				else
-					end = filename.size()-end;
-			}
-
-			if ((uint32_t)lastSlash < filename.size())
-				return filename.subString(lastSlash+1, filename.size()-lastSlash-1-end);
-			else if (end != 0)
-				return filename.subString(0, filename.size()-end);
-			else
-				return filename;
+			auto res = filename.filename();
+			return keepExtension ? res : res.replace_extension();
 		}
 
 	protected:

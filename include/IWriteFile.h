@@ -38,11 +38,11 @@ namespace io
 
 		//! Get name of file.
 		/** \return File name as zero terminated character string. */
-		virtual const path& getFileName() const = 0;
+		virtual const std::filesystem::path& getFileName() const = 0;
 	};
 
 	//! Internal function, please do not use.
-	IWriteFile* createWriteFile(const io::path& fileName, bool append);
+	IWriteFile* createWriteFile(const std::filesystem::path& fileName, bool append);
 
 } // end namespace io
 } // end namespace nbl

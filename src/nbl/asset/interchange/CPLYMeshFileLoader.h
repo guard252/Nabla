@@ -56,7 +56,7 @@ private:
 
 	struct SPLYProperty
 	{
-		core::stringc Name;
+		std::string Name;
 		E_PLY_PROPERTY_TYPE Type;
 		#include "nbl/nblpack.h"
 		union
@@ -117,7 +117,7 @@ private:
 	{
 		// name of the element. We only want "vertex" and "face" elements
 		// but we have to parse the others anyway.
-		core::stringc Name;
+		std::string Name;
 		// The number of elements in the file
 		uint32_t Count;
 		// Properties of this element
