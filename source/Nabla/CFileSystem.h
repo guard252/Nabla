@@ -95,9 +95,6 @@ class CFileSystem : public IFileSystem
         //! like this: "drive:\directory\sudirectory\"
         virtual bool changeWorkingDirectoryTo(const std::filesystem::path& newDirectory);
 
-        //! Converts a relative path to an absolute (unique) path, resolving symbolic links
-       // virtual std::string getAbsolutePath(const std::filesystem::path& filename) const;
-
         //! Get the relative filename, relative to the given directory
         virtual std::filesystem::path getRelativeFilename(const std::filesystem::path& filename, const std::filesystem::path& directory) const;
 

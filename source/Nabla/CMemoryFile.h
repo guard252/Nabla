@@ -50,10 +50,10 @@ namespace io
             inline size_t getPos() const {return Pos;}
 
             //! returns name of file
-            inline const std::filesystem::path& getFileName() const {return Filename;}
+            inline std::string getFileName() const {return Filename.string();}
 
             //! Constructor
-            CMemoryFile(const size_t& len, const io::path& fileName);
+            CMemoryFile(const size_t& len, const std::filesystem::path& fileName);
 
             //! Destructor
             virtual ~CMemoryFile();
@@ -69,7 +69,7 @@ namespace io
 	{
         public:
             //! Constructor
-            CMemoryWriteFile(const size_t& len, const io::path& fileName);
+            CMemoryWriteFile(const size_t& len, const std::filesystem::path& fileName);
 
             //! changes position in file, returns true if successful
             virtual bool seek(const size_t& finalPos, bool relativeMovement = false);
@@ -81,7 +81,7 @@ namespace io
             virtual size_t getPos() const {return CMemoryFile::getPos();}
 
             //! returns name of file
-            virtual const std::filesystem::path& getFileName() const {return CMemoryFile::getFileName();}
+            virtual std::string getFileName() const {return CMemoryFile::getFileName();}
 
             //! returns how much was written
             virtual int32_t write(const void* buffer, uint32_t sizeToWrite);
@@ -111,7 +111,7 @@ namespace io
     public:
         using allocator_type = Alloc;
 
-        CCustomAllocatorMemoryReadFile(void* _data, size_t _length, const io::path& _filename, core::adopt_memory_t, Alloc&& _alloc = Alloc()) :
+        CCustomAllocatorMemoryReadFile(void* _data, size_t _length, const std::filesystem::path& _filename, core::adopt_memory_t, Alloc&& _alloc = Alloc()) :
             m_storage{_data}, m_length{_length}, m_position{0u}, m_filename{_filename}, m_allocator{std::move(_alloc)}
         {
         }
@@ -137,7 +137,7 @@ namespace io
 
         virtual size_t getPos() const override { return m_position; }
 
-        virtual const std::filesystem::path& getFileName() const override { return m_filename; }
+        virtual std::string getFileName() const override { return m_filename.string(); }
 
         virtual int32_t read(void* buffer, uint32_t sizeToRead) override
         {

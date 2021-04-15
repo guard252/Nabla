@@ -186,7 +186,7 @@ namespace impl
 
             std::filesystem::path name = (_type == shaderc_include_type_relative) ? (relDir.string() + _requested_source) : (_requested_source);
             if (!reqBuiltin)
-                name = m_fs->getAbsolutePath(name);
+                name = std::filesystem::absolute(name);
 
             if (_type == shaderc_include_type_relative)
                 res_str = m_inclHandler->getIncludeRelative(_requested_source, relDir.string());

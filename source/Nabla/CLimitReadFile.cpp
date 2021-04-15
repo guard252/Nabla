@@ -15,7 +15,7 @@ namespace io
 
 
 CLimitReadFile::CLimitReadFile(IReadFile* alreadyOpenedFile, const size_t& pos,
-		const size_t& areaSize, const io::path& name)
+		const size_t& areaSize, const std::filesystem::path& name)
 	: Filename(name), AreaStart(0), AreaEnd(0), Pos(0),
 	File(alreadyOpenedFile)
 {
@@ -113,9 +113,9 @@ size_t CLimitReadFile::getPos() const
 
 
 //! returns name of file
-const std::filesystem::path& CLimitReadFile::getFileName() const
+std::string CLimitReadFile::getFileName() const
 {
-	return Filename;
+	return Filename.string();
 }
 
 

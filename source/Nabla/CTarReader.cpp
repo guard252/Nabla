@@ -28,7 +28,7 @@ CArchiveLoaderTAR::CArchiveLoaderTAR(io::IFileSystem* fs)
 
 
 //! returns true if the file maybe is able to be loaded by this class
-bool CArchiveLoaderTAR::isALoadableFileFormat(const io::path& filename) const
+bool CArchiveLoaderTAR::isALoadableFileFormat(const std::filesystem::path& filename) const
 {
 	return core::hasFileExtension(filename, "tar");
 }
@@ -42,7 +42,7 @@ bool CArchiveLoaderTAR::isALoadableFileFormat(E_FILE_ARCHIVE_TYPE fileType) cons
 //! Creates an archive from the filename
 /** \param file File handle to check.
 \return Pointer to newly created archive, or 0 upon error. */
-IFileArchive* CArchiveLoaderTAR::createArchive(const io::path& filename) const
+IFileArchive* CArchiveLoaderTAR::createArchive(const std::filesystem::path& filename) const
 {
 	IFileArchive *archive = 0;
 	io::IReadFile* file = FileSystem->createAndOpenFile(filename);
@@ -124,7 +124,7 @@ bool CArchiveLoaderTAR::isALoadableFileFormat(io::IReadFile* file) const
 /*
 	TAR Archive
 */
-CTarReader::CTarReader(IReadFile* file) : CFileList(file ? file->getFileName() : io::path("")), File(file)
+CTarReader::CTarReader(IReadFile* file) : CFileList(file ? file->getFileName() : std::filesystem::path("")), File(file)
 {
 	#ifdef _NBL_DEBUG
 	setDebugName("CTarReader");

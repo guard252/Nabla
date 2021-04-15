@@ -27,7 +27,7 @@ namespace io
             virtual ~CLimitReadFile();
 
         public:
-            CLimitReadFile(IReadFile* alreadyOpenedFile, const size_t& pos, const size_t& areaSize, const io::path& name);
+            CLimitReadFile(IReadFile* alreadyOpenedFile, const size_t& pos, const size_t& areaSize, const std::filesystem::path& name);
 
             //! returns how much was read
             virtual int32_t read(void* buffer, uint32_t sizeToRead);
@@ -44,11 +44,11 @@ namespace io
             virtual size_t getPos() const;
 
             //! returns name of file
-            virtual const io::path& getFileName() const;
+            virtual std::string getFileName() const;
 
         private:
 
-            io::path Filename;
+            std::filesystem::path Filename;
             size_t AreaStart;
             size_t AreaEnd;
             size_t Pos;

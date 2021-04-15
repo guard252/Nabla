@@ -57,7 +57,7 @@ CArchiveLoaderZIP::CArchiveLoaderZIP(io::IFileSystem* fs)
 }
 
 //! returns true if the file maybe is able to be loaded by this class
-bool CArchiveLoaderZIP::isALoadableFileFormat(const io::path& filename) const
+bool CArchiveLoaderZIP::isALoadableFileFormat(const std::filesystem::path& filename) const
 {
 	return core::hasFileExtension(filename, "zip", "pk3") ||
 	       core::hasFileExtension(filename, "gz", "tgz");
@@ -73,7 +73,7 @@ bool CArchiveLoaderZIP::isALoadableFileFormat(E_FILE_ARCHIVE_TYPE fileType) cons
 //! Creates an archive from the filename
 /** \param file File handle to check.
 \return Pointer to newly created archive, or 0 upon error. */
-IFileArchive* CArchiveLoaderZIP::createArchive(const io::path& filename) const
+IFileArchive* CArchiveLoaderZIP::createArchive(const std::filesystem::path& filename) const
 {
 	IFileArchive *archive = 0;
 	io::IReadFile* file = FileSystem->createAndOpenFile(filename);
@@ -128,7 +128,7 @@ bool CArchiveLoaderZIP::isALoadableFileFormat(io::IReadFile* file) const
 // zip archive
 // -----------------------------------------------------------------------------
 
-CZipReader::CZipReader(IReadFile* file, bool isGZip) : CFileList(file ? file->getFileName() : io::path("")), File(file), IsGZip(isGZip)
+CZipReader::CZipReader(IReadFile* file, bool isGZip) : CFileList(file ? file->getFileName() : std::filesystem::path("")), File(file), IsGZip(isGZip)
 {
 	#ifdef _NBL_DEBUG
 	setDebugName("CZipReader");
@@ -371,7 +371,7 @@ bool CZipReader::scanZipHeader(bool ignoreGPBits)
 	//os::Debuginfo::print("added file from archive", ZipFileName.c_str());
 	#endif
 
-	addItem(ZipFileName, entry.Offset, entry.header.DataDescriptor.UncompressedSize, ZipFileName.lastChar()=='/', FileInfo.size());
+	addItem(ZipFileName, entry.Offset, entry.header.DataDescriptor.UncompressedSize, *ZipFileName.string().rbegin()=='/', FileInfo.size());
 	FileInfo.push_back(entry);
 
 	return true;
@@ -381,7 +381,7 @@ bool CZipReader::scanZipHeader(bool ignoreGPBits)
 //! scans for a local header, returns false if there is no more local file header.
 bool CZipReader::scanCentralDirectoryHeader()
 {
-	io::path ZipFileName = "";
+	std::filesystem::path ZipFileName = "";
 	SZIPFileCentralDirFileHeader entry;
 	File->read(&entry, sizeof(SZIPFileCentralDirFileHeader));
 

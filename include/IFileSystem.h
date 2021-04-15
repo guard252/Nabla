@@ -38,7 +38,7 @@ class IFileSystem : public virtual core::IReferenceCounted
 		\return Pointer to the created file interface.
 		The returned pointer should be dropped when no longer needed.
 		See IReferenceCounted::drop() for more information. */
-		virtual IReadFile* createAndOpenFile(const path& filename) =0;
+		virtual IReadFile* createAndOpenFile(const std::filesystem::path& filename) =0;
 
 		//! Creates an IReadFile interface for accessing memory like a file.
 		/** This allows you to use a pointer to memory where an IReadFile is requested.
@@ -212,11 +212,6 @@ class IFileSystem : public virtual core::IReferenceCounted
 		the form "<drive>:\<directory>\<sudirectory>\<..>". An example would be: "C:\Windows\"
 		\return True if successful, otherwise false. */
 		virtual bool changeWorkingDirectoryTo(const std::filesystem::path& newDirectory) =0;
-
-		//! Converts a relative path to an absolute (unique) path, resolving symbolic links if required
-		/** \param filename Possibly relative file or directory name to query.
-		\result Absolute filename which points to the same file. */
-		virtual std::filesystem::path getAbsolutePath(const std::filesystem::path& filename) const =0;
 
 		//! Get the relative filename, relative to the given directory
 		virtual std::filesystem::path getRelativeFilename(const std::filesystem::path& filename, const std::filesystem::path& directory) const =0;

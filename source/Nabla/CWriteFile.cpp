@@ -12,7 +12,7 @@ namespace io
 {
 
 
-CWriteFile::CWriteFile(const io::path& fileName, bool append)
+CWriteFile::CWriteFile(const std::filesystem::path& fileName, bool append)
 : FileSize(0)
 {
 	#ifdef _NBL_DEBUG
@@ -76,7 +76,7 @@ size_t CWriteFile::getPos() const
 //! opens the file
 void CWriteFile::openFile(bool append)
 {
-	if (Filename.size() == 0)
+	if (Filename.string().size() == 0)
 	{
 		File = 0;
 		return;
@@ -85,7 +85,7 @@ void CWriteFile::openFile(bool append)
 #if defined(_NBL_WCHAR_FILESYSTEM)
 	File = _wfopen(Filename.c_str(), append ? L"ab" : L"wb");
 #else
-	File = fopen(Filename.c_str(), append ? "ab" : "wb");
+	File = fopen(Filename.string().c_str(), append ? "ab" : "wb");
 #endif
 
 	if (File)
@@ -101,14 +101,14 @@ void CWriteFile::openFile(bool append)
 
 
 //! returns name of file
-const io::path& CWriteFile::getFileName() const
+std::string CWriteFile::getFileName() const
 {
-	return Filename;
+	return Filename.string();
 }
 
 
 
-IWriteFile* createWriteFile(const io::path& fileName, bool append)
+IWriteFile* createWriteFile(const std::filesystem::path& fileName, bool append)
 {
 	CWriteFile* file = new CWriteFile(fileName, append);
 	if (file->isOpen())

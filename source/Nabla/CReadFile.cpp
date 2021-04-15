@@ -92,9 +92,9 @@ void CReadFile::openFile()
 
 
 //! returns name of file
-const std::filesystem::path& CReadFile::getFileName() const
+std::string CReadFile::getFileName() const
 {
-	return Filename;
+	return Filename.string();
 }
 
 

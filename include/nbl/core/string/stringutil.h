@@ -230,30 +230,33 @@ namespace core
 	*/
 	namespace impl
 	{
-		template<typename string_type, typename ext_string_type>
-		inline bool compareStrings(int32_t& retval, const string_type& filename, const int32_t& extPos, const ext_string_type& ext)
+		template<typename ext_string_type>
+		inline bool compareStrings(int32_t& retval, const std::filesystem::path& filename, const int32_t& extPos, const ext_string_type& ext)
 		{
 			retval++; 
-			return filename.equals_substring_ignore_case(ext, extPos);
+			return strcmpi(filename.extension().string().c_str(), ext.c_str()) == 0;
 		}
-		template<typename string_type, typename ext_string_type, typename... rest_string_type>
-		inline bool compareStrings(int32_t& retval, const string_type& filename, const int32_t& extPos, const ext_string_type& ext, const rest_string_type&... exts)
+		template<typename ext_string_type, typename... rest_string_type>
+		inline bool compareStrings(int32_t& retval, const std::filesystem::path& filename, const int32_t& extPos, const ext_string_type& ext, const rest_string_type&... exts)
 		{
 			if (compareStrings(retval, filename, extPos, ext))
 				return true;
 			return compareStrings(retval, filename, extPos, exts...);
 		}
 	}
-	template<typename string_type, typename... ext_string_type>
-	inline int32_t isFileExtension(const string_type& filename, const ext_string_type&... ext)
+	//template<typename... ext_string_type>
+	inline int32_t isFileExtension(const std::filesystem::path& filename, const std::string& ext...)
 	{
-		int32_t extPos = filename.findLast('.');
+		std::string filename_str = filename.string();
+		std::string file_ext = filename.extension().string();
+		file_ext = file_ext.substr(1, file_ext.size() - 1);
+		int32_t extPos = filename_str.find_last_of('.');
 		if (extPos < 0)
 			return 0;
 		extPos += 1;
 
 		int32_t retval = 0;
-		if (impl::compareStrings<string_type, ext_string_type...>(retval,filename, extPos, ext...))
+		if (impl::compareStrings(retval, file_ext, extPos, ext))
 			return retval;
 		else
 			return 0;

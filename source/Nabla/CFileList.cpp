@@ -23,7 +23,7 @@ CFileList::CFileList(const std::filesystem::path& path) : Path(path)
 	setDebugName("CFileList");
 	#endif
 
-	handleBackslashes(&Path);
+	core::handleBackslashes(&Path);
 }
 
 CFileList::~CFileList()

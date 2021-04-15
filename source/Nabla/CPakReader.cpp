@@ -40,7 +40,7 @@ CArchiveLoaderPAK::CArchiveLoaderPAK( io::IFileSystem* fs)
 
 
 //! returns true if the file maybe is able to be loaded by this class
-bool CArchiveLoaderPAK::isALoadableFileFormat(const io::path& filename) const
+bool CArchiveLoaderPAK::isALoadableFileFormat(const std::filesystem::path& filename) const
 {
 	return core::hasFileExtension(filename, "pak");
 }
@@ -54,7 +54,7 @@ bool CArchiveLoaderPAK::isALoadableFileFormat(E_FILE_ARCHIVE_TYPE fileType) cons
 //! Creates an archive from the filename
 /** \param file File handle to check.
 \return Pointer to newly created archive, or 0 upon error. */
-IFileArchive* CArchiveLoaderPAK::createArchive(const io::path& filename) const
+IFileArchive* CArchiveLoaderPAK::createArchive(const std::filesystem::path& filename) const
 {
 	IFileArchive *archive = 0;
 	io::IReadFile* file = FileSystem->createAndOpenFile(filename);
@@ -102,7 +102,7 @@ bool CArchiveLoaderPAK::isALoadableFileFormat(io::IReadFile* file) const
 /*!
 	PAK Reader
 */
-CPakReader::CPakReader(IReadFile* file) : CFileList(file ? file->getFileName() : io::path("")), File(file)
+CPakReader::CPakReader(IReadFile* file) : CFileList(file ? file->getFileName() : std::filesystem::path("")), File(file)
 {
 #ifdef _NBL_DEBUG
 	setDebugName("CPakReader");

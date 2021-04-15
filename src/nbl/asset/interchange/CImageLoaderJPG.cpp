@@ -175,7 +175,7 @@ asset::SAssetBundle CImageLoaderJPG::loadAsset(io::IReadFile* _file, const asset
 	if (!_file || _file->getSize()>0xffffffffull)
         return {};
 
-	const io::path& Filename = _file->getFileName();
+	const std::filesystem::path& Filename = _file->getFileName();
 
 	uint8_t* input = new uint8_t[_file->getSize()];
 	_file->read(input, static_cast<uint32_t>(_file->getSize()));
@@ -192,7 +192,7 @@ asset::SAssetBundle CImageLoaderJPG::loadAsset(io::IReadFile* _file, const asset
 	cinfo.err = jpeg_std_error(&jerr.pub);
 	cinfo.err->error_exit = jpeg::error_exit;
 	cinfo.err->output_message = jpeg::output_message;
-    cinfo.client_data = const_cast<char*>(Filename.c_str());
+    cinfo.client_data = const_cast<char*>(Filename.string().c_str());
 
 	auto exitRoutine = [&] {
 		jpeg_destroy_decompress(&cinfo);
@@ -281,7 +281,7 @@ asset::SAssetBundle CImageLoaderJPG::loadAsset(io::IReadFile* _file, const asset
 			return {};
 			break;
 		case JCS_BG_YCC: // interesting
-			os::Printer::log("Loading JPEG Big Gamut YCbCr is not implemented yet:", _file->getFileName()), ELL_ERROR);
+			os::Printer::log("Loading JPEG Big Gamut YCbCr is not implemented yet:", _file->getFileName(), ELL_ERROR);
 			return {};
 			break;
 		default:
