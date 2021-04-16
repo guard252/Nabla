@@ -3,18 +3,18 @@
 
 #include <filesystem>
 
-namespace nbl
+namespace nbl::core
 {
     //TODO: Figure out where to move this
     using string = std::string;
 }
 namespace nbl::system
 {
-
     using path = std::filesystem::path;
-    inline nbl::string extension_wo_dot(const path& _filename)
+ 
+    inline nbl::core::string extension_wo_dot(const path& _filename)
     {
-        return _filename.extension().string().substr(1u, nbl::string::npos);
+        return _filename.extension().string().substr(1u, nbl::core::string::npos);
     }
 
     inline path filename_wo_extension(const path& filename)

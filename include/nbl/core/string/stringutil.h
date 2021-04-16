@@ -13,6 +13,7 @@
 #include "string.h"
 #include "irrString.h" // file&class to kill
 #include <filesystem>
+#include <nbl/system/path.h>
 
 namespace nbl
 {
@@ -225,7 +226,7 @@ namespace core
 	{
 		std::string filename_str = filename.string();
 		std::string file_ext = filename.extension().string();
-		file_ext = file_ext.substr(1, file_ext.size() - 1);
+		file_ext = nbl::system::extension_wo_dot(file_ext);
 		auto found = std::find(extensions.begin(), extensions.end(), file_ext);
 		if (found == extensions.end()) return 0;
 		return found - extensions.begin() + 1;

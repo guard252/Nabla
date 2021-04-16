@@ -50,9 +50,8 @@ class CBuiltinIncluder : public IIncluder
             if (!IIncludeHandler::isBuiltinPath(_path))
                 return {};
 
-            const std::string relativePath = _path.string().substr(strlen(IIncludeHandler::BUILTIN_PREFIX), std::string::npos); // builtin loaders take path relative to PREFIX
-            std::string path = _path.string().substr(0, _path.string().find_last_of('/')+1);
-
+            const std::string relativePath = std::filesystem::relative(_path, system::path(IIncludeHandler::BUILTIN_PREFIX)).string();
+            std::string path = _path.parent_path().string();
             std::string res;
             while (path != IIncludeHandler::BUILTIN_PREFIX) // going up the directory tree
             {

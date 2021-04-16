@@ -31,7 +31,7 @@ SAssetBundle CGLSLLoader::loadAsset(IReadFile* _file, const IAssetLoader::SAsset
 
 	const std::filesystem::path& filename = _file->getFileName();
 	//! TODO: Actually invoke the GLSL compiler to decode our type from any `#pragma`s
-	std::filesystem::path extension = filename.extension();
+	std::filesystem::path extension = nbl::system::extension_wo_dot(filename.extension());
 
 	core::unordered_map<std::string,ISpecializedShader::E_SHADER_STAGE> typeFromExt =	{	
 																							{".vert",ISpecializedShader::ESS_VERTEX},
@@ -45,5 +45,5 @@ SAssetBundle CGLSLLoader::loadAsset(IReadFile* _file, const IAssetLoader::SAsset
 	if (found==typeFromExt.end())
 		return {};
 
-	return SAssetBundle(nullptr,{ core::make_smart_refctd_ptr<ICPUSpecializedShader>(std::move(shader),ISpecializedShader::SInfo({},nullptr,"main",found->second,filename.string())) });
+	return SAssetBundle(nullptr,{ core::make_smart_refctd_ptr<ICPUSpecializedShader>(std::move(shader),ISpecializedShader::SInfo({},nullptr,"main",found->second,filename)) });
 } 
