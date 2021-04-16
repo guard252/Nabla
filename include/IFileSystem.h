@@ -111,7 +111,7 @@ class IFileSystem : public virtual core::IReferenceCounted
 		\return True if the archive was added successfully, false if not. */
 		virtual bool addFileArchive(const std::filesystem::path& filename,
 				E_FILE_ARCHIVE_TYPE archiveType=EFAT_UNKNOWN,
-				const std::string_view password="",
+				const std::string_view& password="",
 				IFileArchive** retArchive=0) =0;
 
 		//! Adds an archive to the file system.
@@ -138,7 +138,7 @@ class IFileSystem : public virtual core::IReferenceCounted
 		\return True if the archive was added successfully, false if not. */
 		virtual bool addFileArchive(IReadFile* file,
 				E_FILE_ARCHIVE_TYPE archiveType=EFAT_UNKNOWN,
-				const std::string_view password="",
+				const std::string_view& password="",
 				IFileArchive** retArchive=0) =0;
 
 		//! Adds an archive to the file system.
@@ -212,9 +212,6 @@ class IFileSystem : public virtual core::IReferenceCounted
 		the form "<drive>:\<directory>\<sudirectory>\<..>". An example would be: "C:\Windows\"
 		\return True if successful, otherwise false. */
 		virtual bool changeWorkingDirectoryTo(const std::filesystem::path& newDirectory) =0;
-
-		//! Get the relative filename, relative to the given directory
-		virtual std::filesystem::path getRelativeFilename(const std::filesystem::path& filename, const std::filesystem::path& directory) const =0;
 
 		//! Creates a list of files and directories in the current working directory and returns it.
 		/** \return a Pointer to the created IFileList is returned. After the list has been used

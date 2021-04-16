@@ -8,7 +8,6 @@
 
 #include "nbl/core/core.h"
 
-#include "path.h"
 #include "vector3d.h"
 #include "dimension2d.h"
 #include "SColor.h"

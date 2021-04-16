@@ -12,7 +12,6 @@
 #include "stddef.h"
 #include "string.h"
 #include "irrString.h" // file&class to kill
-#include "path.h" // file&class to kill
 #include <filesystem>
 
 namespace nbl
@@ -222,44 +221,14 @@ namespace core
 
 	// ----------- some basic quite often used string functions -----------------
 
-	//! Search if a filename has a proper extension.
-	/** Compares file's extension to three given extensions ignoring case.
-	@param filename String being the file's name.
-	@param ext The extensions to compare with.
-	@returns 0 if `filename` does not contain '.' (dot) character or neither of given extensions match. Otherwise an integral value indicating which of given extension matched.
-	*/
-	namespace impl
-	{
-		template<typename ext_string_type>
-		inline bool compareStrings(int32_t& retval, const std::filesystem::path& filename, const int32_t& extPos, const ext_string_type& ext)
-		{
-			retval++; 
-			return strcmpi(filename.extension().string().c_str(), ext.c_str()) == 0;
-		}
-		template<typename ext_string_type, typename... rest_string_type>
-		inline bool compareStrings(int32_t& retval, const std::filesystem::path& filename, const int32_t& extPos, const ext_string_type& ext, const rest_string_type&... exts)
-		{
-			if (compareStrings(retval, filename, extPos, ext))
-				return true;
-			return compareStrings(retval, filename, extPos, exts...);
-		}
-	}
-	//template<typename... ext_string_type>
-	inline int32_t isFileExtension(const std::filesystem::path& filename, const std::string& ext...)
+	inline int32_t isFileExtension(const std::filesystem::path& filename, const std::initializer_list<std::string_view>& extensions)
 	{
 		std::string filename_str = filename.string();
 		std::string file_ext = filename.extension().string();
 		file_ext = file_ext.substr(1, file_ext.size() - 1);
-		int32_t extPos = filename_str.find_last_of('.');
-		if (extPos < 0)
-			return 0;
-		extPos += 1;
-
-		int32_t retval = 0;
-		if (impl::compareStrings(retval, file_ext, extPos, ext))
-			return retval;
-		else
-			return 0;
+		auto found = std::find(extensions.begin(), extensions.end(), file_ext);
+		if (found == extensions.end()) return 0;
+		return found - extensions.begin() + 1;
 	}
 
 	//! Search if a filename has a proper extension.
@@ -268,37 +237,10 @@ namespace core
 	@param ext Variadic list of extensions to compare with
 	@returns Boolean value indicating whether file is of one of given extensions.
 	*/
-	template<typename string_type, typename... ext_string_type>
-	inline bool hasFileExtension(const string_type& filename, const ext_string_type&... ext)
+	template<typename... ext_string_type>
+	inline bool hasFileExtension(const std::filesystem::path& filename, const ext_string_type&... ext)
 	{
-		return isFileExtension(filename, ext...) > 0;
-	}
-
-	//! Cuts the filename extension from a source file path and store it in a dest file path.
-	/** @param dest String to save the result.
-	@param source Source string.
-	@returns Reference to string with the result (i.e. first parameter).
-	*/
-	inline io::path& cutFilenameExtension(io::path& dest, const io::path& source)
-	{
-		int32_t endPos = source.findLast('.');
-		dest = source.subString(0, endPos < 0 ? source.size() : endPos);
-		return dest;
-	}
-
-	//! Gets the filename extension from a file path.
-	/** @param dest String to save the result.
-	@param source Source string.
-	@returns Reference to string with the result (i.e. first parameter).
-	*/
-	inline io::path& getFileNameExtension(io::path& dest, const io::path& source)
-	{
-		int32_t endPos = source.findLast('.');
-		if (endPos < 0)
-			dest = "";
-		else
-			dest = source.subString(endPos, source.size());
-		return dest;
+		return isFileExtension(filename, { ext... }) > 0;
 	}
 
 	//! Delete path from filename.

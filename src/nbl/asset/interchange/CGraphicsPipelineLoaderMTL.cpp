@@ -116,7 +116,7 @@ SAssetBundle CGraphicsPipelineLoaderMTL::loadAsset(io::IReadFile* _file, const I
         _hierarchyLevel,
         _override
     );
-    const std::string fullName = _file->getFileName().c_str();
+    const std::string fullName = _file->getFileName().string();
 	const std::string relPath = [&fullName]() -> std::string
 	{
 		auto dir = std::filesystem::path(fullName).parent_path().string();

@@ -7,7 +7,6 @@
 #define __NBL_I_WRITE_FILE_H_INCLUDED__
 
 #include "nbl/core/IReferenceCounted.h"
-#include "path.h"
 
 namespace nbl
 {

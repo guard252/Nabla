@@ -198,7 +198,7 @@ bool CFileSystem::moveFileArchive(uint32_t sourceIndex, int32_t relative)
 
 //! Adds an archive to the file system.
 bool CFileSystem::addFileArchive(const std::filesystem::path& filename, E_FILE_ARCHIVE_TYPE archiveType,
-			  const std::string_view password,
+			  const std::string_view& password,
 			  IFileArchive** retArchive)
 {
 	IFileArchive* archive = 0;
@@ -304,7 +304,7 @@ bool CFileSystem::addFileArchive(const std::filesystem::path& filename, E_FILE_A
 
 // don't expose!
 bool CFileSystem::changeArchivePassword(const std::filesystem::path& filename,
-		const std::string_view password,
+		const std::string_view& password,
 		IFileArchive** archive)
 {
 	for (int32_t idx = 0; idx < (int32_t)FileArchives.size(); ++idx)
@@ -327,7 +327,7 @@ bool CFileSystem::changeArchivePassword(const std::filesystem::path& filename,
 }
 
 bool CFileSystem::addFileArchive(IReadFile* file, E_FILE_ARCHIVE_TYPE archiveType,
-		const std::string_view password, IFileArchive** retArchive)
+		const std::string_view& password, IFileArchive** retArchive)
 {
 	if (!file || archiveType == EFAT_FOLDER)
 		return false;
@@ -400,7 +400,7 @@ bool CFileSystem::addFileArchive(IReadFile* file, E_FILE_ARCHIVE_TYPE archiveTyp
 		}
 		else
 		{
-			os::Printer::log("Could not create archive for", file->getFileName(), ELL_ERROR);
+			os::Printer::log("Could not create archive for", file->getFileName().string(), ELL_ERROR);
 		}
 	}
 
@@ -488,54 +488,8 @@ const std::filesystem::path& CFileSystem::getWorkingDirectory()
 	}
 	else
 	{
-		#if defined(_NBL_WINDOWS_API_)
-			char tmp[_MAX_PATH];
-			#if defined(_NBL_WCHAR_FILESYSTEM )
-				_wgetcwd(tmp, _MAX_PATH);
-				WorkingDirectory[FILESYSTEM_NATIVE] = tmp;
-			#else
-				_getcwd(tmp, _MAX_PATH);
-				WorkingDirectory[FILESYSTEM_NATIVE] = tmp;
-			#endif
-            core::handleBackslashes(&WorkingDirectory[FILESYSTEM_NATIVE]);
-		#endif
-
-		#if (defined(_NBL_POSIX_API_) || defined(_NBL_OSX_PLATFORM_))
-
-			// getting the CWD is rather complex as we do not know the size
-			// so try it until the call was successful
-			// Note that neither the first nor the second parameter may be 0 according to POSIX
-
-			#if defined(_NBL_WCHAR_FILESYSTEM )
-				uint32_t pathSize=256;
-				wchar_t *tmpPath = new wchar_t[pathSize];
-				while ((pathSize < (1<<16)) && !(wgetcwd(tmpPath,pathSize)))
-				{
-					delete [] tmpPath;
-					pathSize *= 2;
-					tmpPath = new char[pathSize];
-				}
-				if (tmpPath)
-				{
-					WorkingDirectory[FILESYSTEM_NATIVE] = tmpPath;
-					delete [] tmpPath;
-				}
-			#else
-				uint32_t pathSize=256;
-				char *tmpPath = new char[pathSize];
-				while ((pathSize < (1<<16)) && !(getcwd(tmpPath,pathSize)))
-				{
-					delete [] tmpPath;
-					pathSize *= 2;
-					tmpPath = new char[pathSize];
-				}
-				if (tmpPath)
-				{
-					WorkingDirectory[FILESYSTEM_NATIVE] = tmpPath;
-					delete [] tmpPath;
-				}
-			#endif
-		#endif
+		//TODO: there is probably a better way without global variables
+		WorkingDirectory[FILESYSTEM_NATIVE] = std::filesystem::current_path();
 	}
 
 	return WorkingDirectory[type];
@@ -574,12 +528,6 @@ bool CFileSystem::changeWorkingDirectoryTo(const std::filesystem::path& newDirec
 	}
 
 	return success;
-}
-
-//! Get the relative filename, relative to the given directory
-std::filesystem::path CFileSystem::getRelativeFilename(const std::filesystem::path& filename, const std::filesystem::path& directory) const
-{
-	return std::filesystem::relative(filename, directory);
 }
 
 

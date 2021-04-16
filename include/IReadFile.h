@@ -8,7 +8,6 @@
 
 #include "nbl/core/IReferenceCounted.h"
 #include "nbl/core/string/stringutil.h"
-#include "path.h"
 
 namespace nbl
 {
@@ -43,7 +42,7 @@ namespace io
 
 		//! Get name of file.
 		/** \return File name as zero terminated character string. */
-		virtual std::string getFileName() const = 0;
+		virtual const std::filesystem::path& getFileName() const = 0;
 	};
 
 } // end namespace io

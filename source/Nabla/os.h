@@ -10,7 +10,6 @@
 #include "nbl/core/math/floatutil.h"
 
 #include "irrString.h"
-#include "path.h"
 #include "ILogger.h"
 #include "ITimer.h"
 

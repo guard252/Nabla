@@ -58,7 +58,6 @@
 #include "IOSOperator.h"
 #include "IReadFile.h"
 #include "IrrlichtDevice.h"
-#include "path.h"
 #include "ISceneManager.h"
 #include "ISceneNode.h"
 #include "ISceneNodeAnimator.h"

@@ -137,7 +137,7 @@ namespace io
 
         virtual size_t getPos() const override { return m_position; }
 
-        virtual std::string getFileName() const override { return m_filename.string(); }
+        virtual const std::filesystem::path& getFileName() const override { return m_filename; }
 
         virtual int32_t read(void* buffer, uint32_t sizeToRead) override
         {

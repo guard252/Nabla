@@ -98,14 +98,14 @@ asset::SAssetBundle CImageLoaderPng::loadAsset(io::IReadFile* _file, const asset
 	// Read the first few bytes of the PNG _file
 	if( _file->read(buffer, 8) != 8 )
 	{
-		os::Printer::log("LOAD PNG: can't read _file\n", _file->getFileName(), ELL_ERROR);
+		os::Printer::log("LOAD PNG: can't read _file\n", _file->getFileName().string(), ELL_ERROR);
         return {};
 	}
 
 	// Check if it really is a PNG _file
 	if( png_sig_cmp(buffer, 0, 8) )
 	{
-		os::Printer::log("LOAD PNG: not really a png\n", _file->getFileName(), ELL_ERROR);
+		os::Printer::log("LOAD PNG: not really a png\n", _file->getFileName().string(), ELL_ERROR);
         return {};
 	}
 
@@ -114,7 +114,7 @@ asset::SAssetBundle CImageLoaderPng::loadAsset(io::IReadFile* _file, const asset
 		nullptr, (png_error_ptr)png_cpexcept_error, (png_error_ptr)png_cpexcept_warn);
 	if (!png_ptr)
 	{
-		os::Printer::log("LOAD PNG: Internal PNG create read struct failure\n", _file->getFileName(), ELL_ERROR);
+		os::Printer::log("LOAD PNG: Internal PNG create read struct failure\n", _file->getFileName().string(), ELL_ERROR);
         return {};
 	}
 
@@ -122,7 +122,7 @@ asset::SAssetBundle CImageLoaderPng::loadAsset(io::IReadFile* _file, const asset
 	png_infop info_ptr = png_create_info_struct(png_ptr);
 	if (!info_ptr)
 	{
-		os::Printer::log("LOAD PNG: Internal PNG create info struct failure\n", _file->getFileName().c_str(), ELL_ERROR);
+		os::Printer::log("LOAD PNG: Internal PNG create info struct failure\n", _file->getFileName().string(), ELL_ERROR);
 		png_destroy_read_struct(&png_ptr, nullptr, nullptr);
         return {};
 	}
@@ -244,7 +244,7 @@ asset::SAssetBundle CImageLoaderPng::loadAsset(io::IReadFile* _file, const asset
     RowPointers = _NBL_NEW_ARRAY(png_bytep, Height);
 	if (!RowPointers)
 	{
-		os::Printer::log("LOAD PNG: Internal PNG create row pointers failure\n", _file->getFileName().c_str(), ELL_ERROR);
+		os::Printer::log("LOAD PNG: Internal PNG create row pointers failure\n", _file->getFileName().string(), ELL_ERROR);
 		png_destroy_read_struct(&png_ptr, nullptr, nullptr);
         return {};
 	}
@@ -313,7 +313,7 @@ asset::SAssetBundle CImageLoaderPng::loadAsset(io::IReadFile* _file, const asset
 
 	if (!image)
 	{
-		os::Printer::log("LOAD PNG: Internal PNG create image struct failure\n", _file->getFileName().c_str(), ELL_ERROR);
+		os::Printer::log("LOAD PNG: Internal PNG create image struct failure\n", _file->getFileName().string(), ELL_ERROR);
 		png_destroy_read_struct(&png_ptr, nullptr, nullptr);
 		return {};
 	}

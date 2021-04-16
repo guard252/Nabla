@@ -15,7 +15,7 @@ namespace nbl
 namespace io
 {
 
-static const io::path emptyFileListEntry;
+static const std::filesystem::path emptyFileListEntry;
 
 CFileList::CFileList(const std::filesystem::path& path) : Path(path)
 {

@@ -224,7 +224,7 @@ namespace nbl
 
 		bool performLoadingAsIReadFile(gli::texture& texture, io::IReadFile* file)
 		{
-			const auto fileName = std::string(file->getFileName().c_str());
+			const auto fileName = file->getFileName().string();
 			std::vector<char> memory(file->getSize());
 			const auto sizeOfData = memory.size();
 
@@ -241,14 +241,14 @@ namespace nbl
 				return true;
 			else
 			{
-				os::Printer::log("LOADING GLI: failed to load the file", file->getFileName().c_str(), ELL_ERROR);
+				os::Printer::log("LOADING GLI: failed to load the file", file->getFileName().string(), ELL_ERROR);
 				return false;
 			}
 		}
 
 		bool CGLILoader::isALoadableFileFormat(io::IReadFile* _file) const
 		{
-			const auto fileName = std::string(_file->getFileName().c_str());
+			const auto fileName = _file->getFileName().string();
 			const auto beginningOfFile = _file->getPos();
 
 			constexpr auto ddsMagic = 0x20534444;

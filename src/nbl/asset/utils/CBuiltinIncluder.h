@@ -33,7 +33,7 @@ class CBuiltinIncluder : public IIncluder
         }
 
         //! No-op, cannot add search dirs to includer of builtins
-        void addSearchDirectory(const std::string& _searchDir) override {}
+        void addSearchDirectory(const system::path& _searchDir) override {}
 
         void addBuiltinLoader(core::smart_refctd_ptr<IBuiltinIncludeLoader>&& _loader)
         {
@@ -45,13 +45,13 @@ class CBuiltinIncluder : public IIncluder
         }
 
     protected:
-        std::string getInclude_internal(const std::string& _path) const override
+        std::string getInclude_internal(const system::path& _path) const override
         {
             if (!IIncludeHandler::isBuiltinPath(_path))
                 return {};
 
-            const std::string relativePath = _path.substr(strlen(IIncludeHandler::BUILTIN_PREFIX), std::string::npos); // builtin loaders take path relative to PREFIX
-            std::string path = _path.substr(0, _path.find_last_of('/')+1);
+            const std::string relativePath = _path.string().substr(strlen(IIncludeHandler::BUILTIN_PREFIX), std::string::npos); // builtin loaders take path relative to PREFIX
+            std::string path = _path.string().substr(0, _path.string().find_last_of('/')+1);
 
             std::string res;
             while (path != IIncludeHandler::BUILTIN_PREFIX) // going up the directory tree

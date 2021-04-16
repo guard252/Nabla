@@ -63,7 +63,7 @@ namespace nbl
 		bool readHeader(const char fileName[], SContext& ctx);
 		template<typename rgbaFormat>
 		void readRgba(InputFile& file, std::array<Array2D<rgbaFormat>, 4>& pixelRgbaMapArray, int& width, int& height, E_FORMAT& format, const suffixOfChannelBundle suffixOfChannels);
-		E_FORMAT specifyIrrlichtEndFormat(const mapOfChannels& mapOfChannels, const suffixOfChannelBundle suffixName, const std::string fileName);
+		E_FORMAT specifyIrrlichtEndFormat(const mapOfChannels& mapOfChannels, const suffixOfChannelBundle suffixName, const std::string& fileName);
 
 		//! A helpful struct for handling OpenEXR layout
 		/*
@@ -223,7 +223,7 @@ namespace nbl
 			if (!_file)
 				return {};
 
-			const auto& fileName = _file->getFileName().c_str();
+			const auto& fileName = _file->getFileName().string().c_str();
 
 			SContext ctx;
 			InputFile file = fileName;
@@ -360,7 +360,7 @@ namespace nbl
 			file.readPixels(dw.min.y, dw.max.y);
 		}
 
-		E_FORMAT specifyIrrlichtEndFormat(const mapOfChannels& mapOfChannels, const suffixOfChannelBundle suffixName, const std::string fileName)
+		E_FORMAT specifyIrrlichtEndFormat(const mapOfChannels& mapOfChannels, const suffixOfChannelBundle suffixName, const std::string& fileName)
 		{
 			E_FORMAT retVal;
 
@@ -402,7 +402,7 @@ namespace nbl
 
 		bool readVersionField(io::IReadFile* _file, SContext& ctx)
 		{
-			RgbaInputFile file(_file->getFileName().c_str());
+			RgbaInputFile file(_file->getFileName().string().c_str());
 			auto& versionField = ctx.versionField;
 			
 			versionField.mainDataRegisterField = file.version();

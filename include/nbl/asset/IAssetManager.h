@@ -9,6 +9,7 @@
 #include <ostream>
 
 #include "nbl/core/core.h"
+#include "nbl/system/path.h"
 #include "CConcurrentObjectCache.h"
 
 #include "IFileSystem.h"
@@ -221,9 +222,9 @@ class IAssetManager : public core::IReferenceCounted, public core::QuitSignallin
 
             IAssetLoader::SAssetLoadContext ctx{params, _file};
 
-            std::string filename = _file ? _file->getFileName() : _supposedFilename;
+            std::string filename = _file ? _file->getFileName().string() : _supposedFilename;
             io::IReadFile* file = _override->getLoadFile(_file, filename, ctx, _hierarchyLevel); // WARNING: mem-leak possibility: _override should return smart_ptr<IReadFile> (TODO, inspect this)
-            filename = file ? file->getFileName() : _supposedFilename;
+            filename = file ? file->getFileName().string() : _supposedFilename;
 
             const uint64_t levelFlags = params.cacheFlags >> ((uint64_t)_hierarchyLevel * 2ull);
 
@@ -241,7 +242,7 @@ class IAssetManager : public core::IReferenceCounted, public core::QuitSignallin
             if (!file)
                 return {};//return empty bundle
 
-            auto capableLoadersRng = m_loaders.perFileExt.findRange(getFileExt(filename.c_str()));
+            auto capableLoadersRng = m_loaders.perFileExt.findRange(system::extension_wo_dot(filename.c_str()));
             // loaders associated with the file's extension tryout
             for (auto& loader : capableLoadersRng)
             {
@@ -662,7 +663,7 @@ class IAssetManager : public core::IReferenceCounted, public core::QuitSignallin
             if (!_override)
                 _override = &defOverride;
 
-            auto capableWritersRng = m_writers.perTypeAndFileExt.findRange({_params.rootAsset->getAssetType(), getFileExt(_file->getFileName())});
+            auto capableWritersRng = m_writers.perTypeAndFileExt.findRange({_params.rootAsset->getAssetType(), system::extension_wo_dot(_file->getFileName())});
 
             for (auto& writer : capableWritersRng)
             if (writer.second->writeAsset(_file, _params, _override))
@@ -800,12 +801,6 @@ class IAssetManager : public core::IReferenceCounted, public core::QuitSignallin
         bool insertBuiltinAssetIntoCache(SAssetBundle& _asset)
         {
             return insertAssetIntoCache(_asset, IAsset::EM_IMMUTABLE);
-        }
-
-        static inline std::string getFileExt(const std::filesystem::path& _filename)
-        {
-            auto extWithDot = _filename.extension().string();
-            return extWithDot.substr(1, extWithDot.size() - 1);
         }
 
         // for greet/dispose lambdas for asset caches so we don't have to make another friend decl.

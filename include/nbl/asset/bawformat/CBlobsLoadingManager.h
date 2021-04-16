@@ -9,8 +9,6 @@
 
 #include "stdint.h"
 
-#include "path.h"
-
 #include "nbl/asset/ICPUMesh.h"
 #include "nbl/asset/interchange/IAssetLoader.h"
 
@@ -36,7 +34,7 @@ namespace asset
         IAssetLoader* const ldr;
         IAssetManager* const manager;
 		io::IFileSystem* const fs;
-		const io::path filePath;
+		const std::filesystem::path filePath;
         const asset::IAssetLoader::SAssetLoadParams params;
         asset::IAssetLoader::IAssetLoaderOverride* const loaderOverride;
 		core::stack<core::smart_refctd_ptr<ICPUMesh>> meshesToFlip;

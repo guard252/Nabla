@@ -68,7 +68,7 @@ size_t CReadFile::getPos() const
 //! opens the file
 void CReadFile::openFile()
 {
-	if (Filename.string().size() == 0) // bugfix posted by rt
+	if (Filename.empty()) // bugfix posted by rt
 	{
 		File = 0;
 		return;
@@ -92,9 +92,9 @@ void CReadFile::openFile()
 
 
 //! returns name of file
-std::string CReadFile::getFileName() const
+const std::filesystem::path& CReadFile::getFileName() const
 {
-	return Filename.string();
+	return Filename;
 }
 
 

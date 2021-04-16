@@ -48,13 +48,13 @@ class CFileSystem : public IFileSystem
         //! Adds an archive to the file system.
         virtual bool addFileArchive(const std::filesystem::path& filename,
                 E_FILE_ARCHIVE_TYPE archiveType = EFAT_UNKNOWN,
-                const std::string_view password="",
+                const std::string_view& password="",
                 IFileArchive** retArchive = 0) override;
 
         //! Adds an archive to the file system.
         virtual bool addFileArchive(IReadFile* file,
                 E_FILE_ARCHIVE_TYPE archiveType=EFAT_UNKNOWN,
-                const std::string_view password="",
+                const std::string_view& password="",
                 IFileArchive** retArchive = 0) override;
 
         //! Adds an archive to the file system.
@@ -95,9 +95,6 @@ class CFileSystem : public IFileSystem
         //! like this: "drive:\directory\sudirectory\"
         virtual bool changeWorkingDirectoryTo(const std::filesystem::path& newDirectory);
 
-        //! Get the relative filename, relative to the given directory
-        virtual std::filesystem::path getRelativeFilename(const std::filesystem::path& filename, const std::filesystem::path& directory) const;
-
         virtual EFileSystemType setFileListSystem(EFileSystemType listType);
 
         //! Creates a list of files and directories in the current working directory
@@ -114,7 +111,7 @@ class CFileSystem : public IFileSystem
 
         // don't expose, needs refactoring
         bool changeArchivePassword(const std::filesystem::path& filename,
-                const std::string_view password,
+                const std::string_view& password,
                 IFileArchive** archive = 0);
 
         //! Currently used FileSystemType

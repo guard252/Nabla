@@ -47,7 +47,7 @@ namespace io
             virtual size_t getPos() const;
 
             //! returns name of file
-            virtual std::string getFileName() const;
+            virtual const std::filesystem::path& getFileName() const;
 
         private:
 
